@@ -1,0 +1,8 @@
+// LS-007
+fn classify() -> Int {
+  let input = @provider.make()
+  lexscan input {
+    re"^a" => 1
+    _ => 0
+  }
+}

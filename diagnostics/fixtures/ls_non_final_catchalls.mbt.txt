@@ -1,0 +1,21 @@
+// LS-019D
+fn wildcard(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    _ => 0
+    re"^a" => 1
+  }
+}
+
+fn binder(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    rest => 0
+    re"^a" => 1
+  }
+}
+
+fn placeholder(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    ...
+    re"^a" => 1
+  }
+}

@@ -1,0 +1,7 @@
+// LM-019
+fn invalid(input : String) -> Int {
+  lexmatch input {
+    re"^a$" => 1
+    _ => "string"
+  }
+}

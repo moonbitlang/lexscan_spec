@@ -1,0 +1,2 @@
+// RX-015
+const BAD_BOUNDS = re"a{3,2}"

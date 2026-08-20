@@ -1,0 +1,29 @@
+// RM-018 RM-018A
+fn through_or(input : String) -> Bool {
+  (input =~ (re"a" as captured)) || captured == 'a'
+}
+
+fn through_negation(input : String) -> Bool {
+  !(input =~ (re"a" as captured)) && captured == 'a'
+}
+
+fn false_branch(input : String) -> Char {
+  if input =~ (re"a" as captured) { 'x' } else { captured }
+}
+
+fn true_branch_through_or(input : String) -> Char {
+  if (input =~ (re"a" as captured)) || true { captured } else { 'x' }
+}
+
+fn guard_failure(input : String) -> Char {
+  guard input =~ (re"a" as captured) else { return captured }
+  'x'
+}
+
+fn while_else(input : String) -> Char {
+  while input =~ (re"a" as captured) {
+    return captured
+  } else {
+    captured
+  }
+}

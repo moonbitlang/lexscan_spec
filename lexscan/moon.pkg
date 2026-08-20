@@ -1,0 +1,7 @@
+import {
+  "moonbitlang/core/lexbuf",
+}
+
+import {
+  "moonbitlang/regex-lexical-spec/patterns",
+} for "test"

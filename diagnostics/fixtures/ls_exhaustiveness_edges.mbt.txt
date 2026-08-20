@@ -1,0 +1,10 @@
+// LS-041
+fn empty_cases(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {}
+}
+
+fn scalars_without_eof(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^." => 1
+  }
+}

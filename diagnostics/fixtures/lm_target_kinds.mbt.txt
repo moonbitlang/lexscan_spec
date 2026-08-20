@@ -1,0 +1,26 @@
+// LM-002A
+struct UserTarget {}
+
+fn bytes_target(input : Bytes) -> Int {
+  lexmatch input { _ => 0 }
+}
+
+fn bytes_view_target(input : BytesView) -> Int {
+  lexmatch input { _ => 0 }
+}
+
+fn lexbuf_target(input : @lexbuf.Lexbuf) -> Int {
+  lexmatch input { _ => 0 }
+}
+
+async fn async_lexbuf_target(input : @lexbuf.AsyncLexbuf) -> Int {
+  lexmatch input { _ => 0 }
+}
+
+fn scanner_target(input : @lexbuf.StringScanner) -> Int {
+  lexmatch input { _ => 0 }
+}
+
+fn user_target(input : UserTarget) -> Int {
+  lexmatch input { _ => 0 }
+}

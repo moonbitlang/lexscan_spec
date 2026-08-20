@@ -1,0 +1,14 @@
+// LS-040
+fn type_mismatch(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^a" => 1
+    _ => "other"
+  }
+}
+
+fn guard_is_unavailable(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^a" if true => 1
+    _ => 0
+  }
+}

@@ -1,0 +1,8 @@
+// RX-014A
+const STAR = re"*"
+const PLUS = re"+"
+const OPTIONAL = re"?"
+const CLOSE_GROUP = re")"
+const CLOSE_CLASS = re"]"
+const OPEN_BRACE = re"{"
+const CLOSE_BRACE = re"}"

@@ -1,0 +1,8 @@
+// LM-028A
+fn classify(input : String) -> Int {
+  lexmatch input with longest {
+    (re"^[a-z]+", after=_) => 1
+    (re"^[a-z]", after=_) => 2
+    _ => 0
+  }
+}

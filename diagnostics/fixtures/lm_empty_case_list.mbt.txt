@@ -1,0 +1,4 @@
+// LM-033
+fn classify(input : String) -> Int {
+  lexmatch input {}
+}

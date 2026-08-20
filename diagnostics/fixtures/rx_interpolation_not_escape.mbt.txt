@@ -1,0 +1,2 @@
+// RX-047
+const INTERPOLATION_NOT_ESCAPE = re"\{"

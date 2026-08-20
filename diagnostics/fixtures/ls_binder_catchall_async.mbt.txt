@@ -1,0 +1,4 @@
+// LS-019
+async fn invalid(input : @lexbuf.AsyncLexbuf) -> StringView {
+  lexscan input { rest => rest }
+}

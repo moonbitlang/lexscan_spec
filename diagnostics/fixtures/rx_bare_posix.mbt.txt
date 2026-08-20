@@ -1,0 +1,2 @@
+// RX-027
+const BARE_POSIX = re"[:digit:]"

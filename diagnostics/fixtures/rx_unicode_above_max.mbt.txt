@@ -1,0 +1,2 @@
+// RX-031
+const TOO_LARGE = re"\u{110000}"

@@ -1,0 +1,2 @@
+// RX-023
+const DESCENDING_RANGE = re"[z-a]"

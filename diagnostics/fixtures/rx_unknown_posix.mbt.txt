@@ -1,0 +1,2 @@
+// RX-028
+const UNKNOWN_POSIX = re"[[:emoji:]]"

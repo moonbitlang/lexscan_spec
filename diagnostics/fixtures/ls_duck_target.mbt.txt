@@ -1,0 +1,6 @@
+// LS-006
+struct DuckScanner {}
+
+fn invalid_target(input : DuckScanner) -> Int {
+  lexscan input { _ => 0 }
+}

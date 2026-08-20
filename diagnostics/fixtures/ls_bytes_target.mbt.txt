@@ -1,0 +1,4 @@
+// LS-005
+fn invalid(input : Bytes) -> Int {
+  lexscan input { _ => 0 }
+}

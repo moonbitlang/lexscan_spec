@@ -1,0 +1,14 @@
+// RX-009 RX-010 RX-011
+const NOT_REGEX = 1
+
+fn local_regex_is_not_a_pattern(input : String, local : Regex) -> Bool {
+  input =~ local
+}
+
+fn non_regex_constant(input : String) -> Bool {
+  input =~ NOT_REGEX
+}
+
+fn missing_constant(input : String) -> Bool {
+  input =~ MISSING_REGEX
+}

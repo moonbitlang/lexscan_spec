@@ -1,0 +1,4 @@
+// RX-031D
+fn invalid(value : String) -> Regex {
+  re"\{value}"
+}

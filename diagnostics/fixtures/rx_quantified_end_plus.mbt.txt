@@ -1,0 +1,4 @@
+// RX-046
+fn invalid(input : String) -> Bool {
+  input =~ re"$+"
+}

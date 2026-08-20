@@ -1,0 +1,2 @@
+// RX-028A
+const UNCLOSED_POSIX = re"[[:alpha"

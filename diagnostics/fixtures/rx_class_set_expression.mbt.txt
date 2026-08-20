@@ -1,0 +1,3 @@
+// RX-032 RX-032B
+const SET_INTERSECTION = re"[[a]&&[b]]"
+const SET_SUBTRACTION = re"[[a]--[b]]"

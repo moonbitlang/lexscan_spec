@@ -1,0 +1,7 @@
+// RX-001A
+const UNTERMINATED = re"abc
+
+fn newline_literal(input : String) -> Bool {
+  input =~ re"a
+b"
+}

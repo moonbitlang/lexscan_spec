@@ -1,0 +1,4 @@
+// LM-034
+fn classify(input : String) -> Bool {
+  input lexmatch? "a"
+}

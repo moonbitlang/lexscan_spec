@@ -1,0 +1,6 @@
+// LS-010A
+fn invalid(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input with shortest {
+    _ => 0
+  }
+}

@@ -1,0 +1,5 @@
+// RX-031E
+const EMPTY_NAME = re"(?<>a)"
+const DIGIT_NAME = re"(?<1name>a)"
+const PUNCTUATION_NAME = re"(?<bad-name>a)"
+const UNCLOSED_NAME = re"(?<name"

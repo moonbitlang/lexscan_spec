@@ -1,0 +1,10 @@
+// RX-014
+const NO_OPERAND_STAR = re"*"
+const NO_OPERAND_BOUND = re"{1,2}"
+const REPEATED_PLUS = re"a++"
+const REPEATED_STAR = re"a*+"
+const REPEATED_OPTIONAL = re"a?+"
+const UNCLOSED_BOUND = re"a{"
+const MISSING_CLOSE = re"a{0,1"
+const SPACE_AFTER_OPEN = re"a{ 0,1}"
+const SPACE_AFTER_COMMA = re"a{0, 1}"

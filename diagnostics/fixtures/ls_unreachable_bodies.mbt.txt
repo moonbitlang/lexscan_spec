@@ -1,0 +1,15 @@
+// LS-036 LS-036A
+fn unreachable_regex(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^a" => 1
+    re"^a" => missing_in_regex_case
+    _ => 0
+  }
+}
+
+fn unreachable_catchall(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^(?:.|$)" => 1
+    _ => missing_in_catchall
+  }
+}

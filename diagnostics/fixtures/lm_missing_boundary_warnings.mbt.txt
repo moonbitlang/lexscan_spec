@@ -1,0 +1,21 @@
+// LM-011 LM-012
+fn missing_both(input : String) -> Int {
+  lexmatch input {
+    re"a" => 1
+    _ => 0
+  }
+}
+
+fn missing_after(input : String) -> Int {
+  lexmatch input {
+    re"^a" => 1
+    _ => 0
+  }
+}
+
+fn missing_before(input : String) -> Int {
+  lexmatch input {
+    re"a$" => 1
+    _ => 0
+  }
+}

@@ -1,0 +1,8 @@
+// LS-011
+async fn invalid(input : @lexbuf.AsyncLexbuf) -> Int {
+  lexscan input with longest { (re"^a", after=_) => 1; _ => 0 }
+}
+
+async fn invalid_before(input : @lexbuf.AsyncLexbuf) -> Int {
+  lexscan input with longest { (re"^a", before=_) => 1; _ => 0 }
+}

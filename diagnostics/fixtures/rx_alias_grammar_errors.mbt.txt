@@ -1,0 +1,12 @@
+// RX-041B
+fn sequence_without_alias_group(input : String) -> Bool {
+  input =~ (re"a" as first + re"b")
+}
+
+fn alternation_without_alias_group(input : String) -> Bool {
+  input =~ (re"a" as first | re"b")
+}
+
+fn wildcard_alias(input : String) -> Bool {
+  input =~ (re"a" as _)
+}

@@ -1,0 +1,35 @@
+// LM-012A
+fn named(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=before, after=after) => before.length() + after.length()
+    _ => 0
+  }
+}
+
+fn discarded(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=_, after=_) => 1
+    _ => 0
+  }
+}
+
+fn shorthand(input : String) -> Int {
+  lexmatch input {
+    (re"a", before~, after~) => before.length() + after.length()
+    _ => 0
+  }
+}
+
+fn anchors(input : String) -> Int {
+  lexmatch input {
+    re"^a$" => 1
+    _ => 0
+  }
+}
+
+fn semantic_anchors(input : String) -> Int {
+  lexmatch input {
+    re"(^a$)" => 1
+    _ => 0
+  }
+}

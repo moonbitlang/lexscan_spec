@@ -1,0 +1,21 @@
+// RX-037B
+const HIDDEN = re"(?<word>[a-z]+)"
+const HIDDEN_ANCHORED = re"^(?<word>[a-z]+)"
+
+fn regex_match_scope(input : String) -> StringView {
+  if input =~ HIDDEN { word } else { "" }
+}
+
+fn lexmatch_scope(input : String) -> StringView {
+  lexmatch input {
+    (HIDDEN, before=_, after=_) => word
+    _ => ""
+  }
+}
+
+fn lexscan_scope(input : @lexbuf.Lexbuf) -> StringView {
+  lexscan input {
+    HIDDEN_ANCHORED => word
+    _ => ""
+  }
+}

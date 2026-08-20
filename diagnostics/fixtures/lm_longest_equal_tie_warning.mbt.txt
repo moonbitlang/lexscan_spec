@@ -1,0 +1,8 @@
+// LM-016
+fn tied(input : String) -> Int {
+  lexmatch input with longest {
+    (re"^a.", after=_) => 1
+    (re"^ab", after=_) => 2
+    _ => 0
+  }
+}

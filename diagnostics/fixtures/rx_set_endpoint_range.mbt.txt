@@ -1,0 +1,2 @@
+// RX-024
+const SET_ENDPOINT_RANGE = re"[[:digit:]-a]"

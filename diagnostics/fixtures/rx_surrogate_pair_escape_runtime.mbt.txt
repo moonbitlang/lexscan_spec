@@ -1,0 +1,4 @@
+// RX-031B
+test "well-formed surrogate-pair escapes denote one non-BMP scalar" {
+  assert_true("😀" =~ re"^\uD83D\uDE00$")
+}

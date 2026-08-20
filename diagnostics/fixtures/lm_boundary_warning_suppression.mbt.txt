@@ -1,0 +1,14 @@
+// LM-011 LM-012
+fn suppressed(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=_, after=_) => 1
+    _ => 0
+  }
+}
+
+fn anchored(input : String) -> Int {
+  lexmatch input {
+    re"^a$" => 1
+    _ => 0
+  }
+}

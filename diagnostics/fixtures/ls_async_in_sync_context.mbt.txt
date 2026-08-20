@@ -1,0 +1,4 @@
+// LS-002
+fn invalid(input : @lexbuf.AsyncLexbuf) -> Int {
+  lexscan input { re"^a" => 1; _ => 0 }
+}

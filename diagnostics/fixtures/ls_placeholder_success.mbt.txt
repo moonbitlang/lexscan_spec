@@ -1,0 +1,7 @@
+// LS-019B
+fn classify(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^a" => 1
+    ...
+  }
+}

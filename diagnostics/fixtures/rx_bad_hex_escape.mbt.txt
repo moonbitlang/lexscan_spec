@@ -1,0 +1,2 @@
+// RX-031
+const BAD_HEX = re"\x1"

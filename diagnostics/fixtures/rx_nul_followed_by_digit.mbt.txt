@@ -1,0 +1,2 @@
+// RX-031 RX-032
+const BAD_NUL = re"[\01]"

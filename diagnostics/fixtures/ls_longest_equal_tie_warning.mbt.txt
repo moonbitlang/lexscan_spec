@@ -1,0 +1,8 @@
+// LS-014
+fn classify(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input with longest {
+    re"^a." => 1
+    re"^ab" => 2
+    _ => 0
+  }
+}

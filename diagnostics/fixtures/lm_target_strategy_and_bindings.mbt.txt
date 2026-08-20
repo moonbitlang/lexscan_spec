@@ -1,0 +1,22 @@
+// LM-002 LM-005 LM-013 LM-017
+fn bad_target() -> Int {
+  lexmatch 1 { _ => 0 }
+}
+
+fn bad_strategy(input : String) -> Int {
+  lexmatch input with shortest { _ => 0 }
+}
+
+fn unanchored_longest(input : String) -> Int {
+  lexmatch input with longest {
+    (re"a", after=_) => 1
+    _ => 0
+  }
+}
+
+fn before_in_longest(input : String) -> Int {
+  lexmatch input with longest {
+    (re"^a", before=_, after=_) => 1
+    _ => 0
+  }
+}

@@ -1,0 +1,3 @@
+// RX-032 RX-032A
+const BACKREFERENCE = re"(a)\1"
+const NAMED_BACKREFERENCE = re"(?<x>a)\k<x>"

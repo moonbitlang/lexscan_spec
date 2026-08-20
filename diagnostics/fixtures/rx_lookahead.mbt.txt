@@ -1,0 +1,2 @@
+// RX-032 RX-032A
+const LOOKAHEAD = re"a(?=b)"

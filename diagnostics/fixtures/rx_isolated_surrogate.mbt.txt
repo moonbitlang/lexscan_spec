@@ -1,0 +1,16 @@
+// RX-031B
+fn invalid_high(input : String) -> Bool {
+  input =~ re"\u{d800}"
+}
+
+fn invalid_low(input : String) -> Bool {
+  input =~ re"\u{dfff}"
+}
+
+fn invalid_fixed_high(input : String) -> Bool {
+  input =~ re"\uD800"
+}
+
+fn invalid_fixed_low(input : String) -> Bool {
+  input =~ re"\uDFFF"
+}

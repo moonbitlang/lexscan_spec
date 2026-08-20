@@ -1,0 +1,7 @@
+// RX-036
+fn invalid(input : String) -> Int {
+  lexmatch input {
+    (re"(?<word>[a-z]+)", before=_, after=_) => 1
+    _ => 0
+  }
+}

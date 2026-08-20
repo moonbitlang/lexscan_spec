@@ -1,0 +1,15 @@
+// LM-027A LM-030
+fn unreachable_catchall_body(input : String) -> Int {
+  lexmatch input {
+    re"^.*$" => 1
+    _ => missing_in_catchall
+  }
+}
+
+fn unreachable_regex_body(input : String) -> Int {
+  lexmatch input {
+    re"^a$" => 1
+    re"^a$" => missing_in_regex_case
+    _ => 0
+  }
+}

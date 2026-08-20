@@ -1,0 +1,7 @@
+// RX-036
+fn invalid(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^(?<word>[a-z]+)" => 1
+    _ => 0
+  }
+}

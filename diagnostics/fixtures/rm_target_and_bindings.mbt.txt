@@ -1,0 +1,28 @@
+// RM-003 RM-012 RM-013 RM-014
+fn bad_target() -> Bool {
+  1 =~ re"a"
+}
+
+fn unknown_binding(input : String) -> Bool {
+  input =~ (re"a", middle=_)
+}
+
+fn duplicate_binding(input : String) -> Bool {
+  input =~ (re"a", before=_, before=_)
+}
+
+fn duplicate_after(input : String) -> Bool {
+  input =~ (re"a", after=_, after=_)
+}
+
+fn colliding_names(input : String) -> Bool {
+  input =~ (re"a" as same, before=same)
+}
+
+fn capture_after_collision(input : String) -> Bool {
+  input =~ (re"a" as same, after=same)
+}
+
+fn before_after_collision(input : String) -> Bool {
+  input =~ (re"a", before=same, after=same)
+}

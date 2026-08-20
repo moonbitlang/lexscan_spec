@@ -1,0 +1,42 @@
+// LM-010B
+fn unknown(input : String) -> Int {
+  lexmatch input {
+    (re"a", middle=_) => 1
+    _ => 0
+  }
+}
+
+fn duplicate_before(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=_, before=_, after=_) => 1
+    _ => 0
+  }
+}
+
+fn duplicate_after(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=_, after=_, after=_) => 1
+    _ => 0
+  }
+}
+
+fn capture_before_collision(input : String) -> Int {
+  lexmatch input {
+    (re"a" as same, before=same, after=_) => 1
+    _ => 0
+  }
+}
+
+fn capture_after_collision(input : String) -> Int {
+  lexmatch input {
+    (re"a" as same, before=_, after=same) => 1
+    _ => 0
+  }
+}
+
+fn before_after_collision(input : String) -> Int {
+  lexmatch input {
+    (re"a", before=same, after=same) => 1
+    _ => 0
+  }
+}

@@ -1,0 +1,4 @@
+// RX-029
+fn shorthand(input : String) -> Bool {
+  input =~ re"\d\s\w"
+}

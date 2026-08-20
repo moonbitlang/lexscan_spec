@@ -1,0 +1,12 @@
+// RX-036 RX-042 RX-043
+fn named_group(input : String) -> Bool {
+  input =~ re"(?<word>[a-z]+)"
+}
+
+fn duplicate_binder(input : String) -> Bool {
+  input =~ ((re"a" as same) + (re"b" as same))
+}
+
+fn alias_in_alternation(input : String) -> Bool {
+  input =~ ((re"a" as left) | re"b")
+}

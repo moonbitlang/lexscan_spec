@@ -1,0 +1,2 @@
+// RX-047
+const TRAILING_HYPHEN = re"[a-]"

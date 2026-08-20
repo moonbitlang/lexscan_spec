@@ -1,0 +1,2 @@
+// RX-047
+const LEADING_HYPHEN = re"[-a]"

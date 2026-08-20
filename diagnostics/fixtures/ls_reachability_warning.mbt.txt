@@ -1,0 +1,22 @@
+// LS-032 LS-036 LS-036A
+fn empty_shadows_catchall(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^" => 1
+    _ => 0
+  }
+}
+
+fn shadowed_case(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^a" => 1
+    re"^a" => 2
+    _ => 0
+  }
+}
+
+fn exhaustive_catchall(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    re"^(?:.|$)" => 1
+    _ => 0
+  }
+}

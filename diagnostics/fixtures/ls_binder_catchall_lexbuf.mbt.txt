@@ -1,0 +1,4 @@
+// LS-019
+fn invalid(input : @lexbuf.Lexbuf) -> StringView {
+  lexscan input { rest => rest }
+}

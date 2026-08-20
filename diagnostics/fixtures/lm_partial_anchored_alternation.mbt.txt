@@ -1,0 +1,7 @@
+// LM-014
+fn invalid(input : String) -> Int {
+  lexmatch input with longest {
+    (re"^a|b", after=_) => 1
+    _ => 0
+  }
+}

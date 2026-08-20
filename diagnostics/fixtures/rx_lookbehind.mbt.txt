@@ -1,0 +1,3 @@
+// RX-032 RX-032A
+const LOOKBEHIND = re"(?<=a)b"
+const NEGATIVE_LOOKBEHIND = re"(?<!a)b"

@@ -1,0 +1,14 @@
+// LS-011A
+fn unknown(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    (re"^a", middle=_) => 1
+    _ => 0
+  }
+}
+
+fn duplicate(input : @lexbuf.Lexbuf) -> Int {
+  lexscan input {
+    (re"^a", before=_, before=_) => 1
+    _ => 0
+  }
+}

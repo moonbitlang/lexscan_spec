@@ -1,0 +1,20 @@
+// RM-003A
+fn integer_target() -> Bool {
+  1 =~ re"a"
+}
+
+fn bytes_target(input : Bytes) -> Bool {
+  input =~ re"a"
+}
+
+fn bytes_view_target(input : BytesView) -> Bool {
+  input =~ re"a"
+}
+
+fn lexbuf_target(input : @lexbuf.Lexbuf) -> Bool {
+  input =~ re"a"
+}
+
+fn scanner_target(input : @lexbuf.StringScanner) -> Bool {
+  input =~ re"a"
+}

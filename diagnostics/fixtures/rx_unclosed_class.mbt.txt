@@ -1,0 +1,2 @@
+// RX-031
+const UNCLOSED_CLASS = re"[abc"

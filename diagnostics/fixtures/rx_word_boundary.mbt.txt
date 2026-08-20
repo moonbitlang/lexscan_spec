@@ -1,0 +1,3 @@
+// RX-032 RX-032A
+const WORD_BOUNDARY = re"\bword\b"
+const NON_WORD_BOUNDARY = re"\Bword\B"

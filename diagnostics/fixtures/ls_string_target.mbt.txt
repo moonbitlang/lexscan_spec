@@ -1,0 +1,4 @@
+// LS-004
+fn invalid(input : String) -> Int {
+  lexscan input { _ => 0 }
+}

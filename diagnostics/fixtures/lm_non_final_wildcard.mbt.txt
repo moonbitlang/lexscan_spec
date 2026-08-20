@@ -1,0 +1,7 @@
+// LM-024
+fn classify(input : String) -> Int {
+  lexmatch input {
+    _ => 0
+    re"^.*$" => 1
+  }
+}

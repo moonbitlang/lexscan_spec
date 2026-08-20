@@ -1,0 +1,4 @@
+// RX-031F
+const NUL_OUTSIDE_CLASS = re"\0"
+const HIGH_SURROGATE_IN_CLASS = re"[\uD800]"
+const LOW_SURROGATE_IN_CLASS = re"[\u{DFFF}]"

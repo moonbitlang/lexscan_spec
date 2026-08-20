@@ -1,0 +1,8 @@
+// LS-011
+fn invalid(input : @lexbuf.StringScanner) -> Int {
+  lexscan input { (re"^a", before=_) => 1; _ => 0 }
+}
+
+fn invalid_after(input : @lexbuf.StringScanner) -> Int {
+  lexscan input { (re"^a", after=_) => 1; _ => 0 }
+}

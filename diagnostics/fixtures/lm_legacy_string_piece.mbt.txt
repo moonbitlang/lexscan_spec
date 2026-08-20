@@ -1,0 +1,7 @@
+// LM-034
+fn classify(input : String) -> Int {
+  lexmatch input {
+    (before, "a" ("b*" as bs), after) => bs.length()
+    _ => 0
+  }
+}
