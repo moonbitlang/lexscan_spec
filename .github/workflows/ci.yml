@@ -30,21 +30,29 @@ jobs:
       - run: bash scripts/check_format_fixture.sh
       - run: bash scripts/check_coverage_ids.sh
 
-  runtime:
-    name: Tests (${{ matrix.target }})
+  regex-tests:
+    name: Tests (${{ matrix.regex_backend }}, ${{ matrix.target }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
+        regex_backend: [table, block, runtime]
         target: [wasm, wasm-gc, js, native]
+    env:
+      MOONC_INTERNAL_PARAMS: 'regex_backend=${{ matrix.regex_backend }}|'
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
+      - id: setup
+        uses: ./.github/actions/setup
+      - name: Nullable repetition regression
+        run: moon test lexmatch/nullable_repetition_test.mbt --target ${{ matrix.target }} --target-dir _build/regex-${{ matrix.regex_backend }} --deny-warn
       - name: Debug tests
-        run: moon test --target ${{ matrix.target }} --deny-warn
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: moon test --target ${{ matrix.target }} --target-dir _build/regex-${{ matrix.regex_backend }} --deny-warn
       - name: Release tests
-        run: moon test --target ${{ matrix.target }} --release --deny-warn
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: moon test --target ${{ matrix.target }} --target-dir _build/regex-${{ matrix.regex_backend }} --release --deny-warn
 
   diagnostics:
     name: Diagnostics

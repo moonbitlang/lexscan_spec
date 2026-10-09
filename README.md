@@ -62,7 +62,17 @@ Individual layers can also be run with `moon test`,
 GitHub Actions runs on pull requests, pushes to `main`, and manual dispatches.
 It installs the latest stable MoonBit toolchain and checks formatting, types,
 coverage IDs, diagnostic fixtures, and debug/release tests on `wasm`, `wasm-gc`,
-`js`, and `native`. Each run records the exact toolchain versions.
+`js`, and `native`. The test matrix also explicitly selects each regex backend
+(`table`, `block`, and `runtime`) using
+`MOONC_INTERNAL_PARAMS='regex_backend=<backend>|'`, for 12 combinations.
+Each run records the exact toolchain versions, uses a separate build directory
+per regex backend, and runs release tests even if debug tests fail.
+
+The stable toolchain's core regex runtime currently violates RX-012C. These
+runtime failures remain blocking tests; they are not skipped or treated as
+expected failures. A compiler may fall back to its automaton for unsupported
+runtime patterns, so selecting `runtime` alone does not prove that every regex
+was lowered to a library call.
 
 The CI diagnostic runner uses `--allow-known-divergences` to report the two
 KI-002 surrogate escape fixtures as expected failures only when they exhibit
