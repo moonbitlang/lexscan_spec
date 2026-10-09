@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 239 independently testable requirements. The
-ordinary runtime/type layer contains 128 tests; diagnostic fixtures and format
+The current matrix contains 241 independently testable requirements. The
+ordinary runtime/type layer contains 138 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
@@ -58,6 +58,32 @@ not runnable unless the toolchain installation includes its LLVM core bundle.
 Individual layers can also be run with `moon test`,
 `bash diagnostics/run.sh`, `bash scripts/check_format_fixture.sh`, and
 `bash scripts/check_coverage_ids.sh`.
+
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatches.
+It installs the latest stable MoonBit toolchain and checks formatting, types,
+coverage IDs, diagnostic fixtures, and debug/release tests on `wasm`, `wasm-gc`,
+`js`, and `native`. The test matrix also explicitly selects each regex backend
+(`table`, `block`, and `runtime`) using
+`MOONC_INTERNAL_PARAMS='regex_backend=<backend>|'`, for 12 combinations.
+Each run records the exact toolchain versions, uses a separate build directory
+per regex backend, and runs release tests even if debug tests fail.
+
+RX-012C and RX-012D specify the first-match empty-iteration rule: an unbounded
+nullable repetition finishes after an empty iteration once its minimum is met,
+then retries other paths if its continuation fails. In particular,
+`^(?:a*?b*?)*a` on `"baaa"` must match `"ba"` and leave `"aa"`.
+Published automaton and library runtime implementations both have divergences
+from this rule, recorded as KI-004. These failures remain blocking tests; they
+are not skipped or treated as expected failures. A compiler may fall back to
+its automaton for unsupported runtime patterns, so selecting `runtime` alone
+does not prove that every regex was lowered to a library call.
+
+The CI diagnostic runner uses `--allow-known-divergences` to report the two
+KI-002 surrogate escape fixtures as expected failures only when they exhibit
+the recorded `Moonc.Basic_utf8_decode.MalFormed` crash. Their normative
+expectations stay unchanged; every other diagnostic failure blocks CI.
+Diagnostic logs are uploaded even on failure. The default local runner stays
+strict, and a fixed compiler passes these fixtures normally.
 
 The diagnostic runner is intentionally strict. A baseline compiler that still
 has a divergence listed in

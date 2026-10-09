@@ -277,3 +277,20 @@ Inputs containing isolated high or low surrogates in the logical target are
 outside the language contract. Their matching, capture, cursor, refill, and
 error behavior is intentionally not specified, and no conformance test may
 depend on it.
+
+## RQ-017: First-match priority in nullable repetition
+
+Resolved: use the empty-iteration rule in Section 5.1 of
+[Regex Patterns and Matching Model](01-regex-patterns.md#51-nullable-repetition-and-empty-iterations).
+After an empty iteration meets an unbounded repetition's minimum count, try
+its continuation before further iterations on that path. A failed continuation
+still permits retrying other alternatives, including consuming paths of that
+iteration. The operand's internal priorities and final-path captures remain
+observable.
+
+In particular, `^(?:a*?b*?)*a` on `"baaa"` MUST match `"ba"` and leave
+`"aa"`. Likewise, `^(?:a?|b)*` on `"ab"` MUST match `"a"` and leave
+`"b"`; adding `$` forces retry and permits matching the complete `"ab"`.
+Finite bounds, mandatory empty iterations, and `longest` semantics retain
+their separate contracts. Implementation-specific epsilon-cycle suppression
+does not define the selected first-match path.

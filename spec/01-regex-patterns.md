@@ -163,6 +163,11 @@ therefore grouped forms such as `(^){2}`, `(?:^)+`, and `(?i:^)?` are valid.
 Repeating such a group still consumes no input. As with every nullable
 repetition, evaluation MUST terminate without inventing input progress.
 
+Nullable repetition under first-match semantics follows the empty-iteration
+rule in Section 5.1. The operand's internal priorities remain observable even
+inside a greedy repetition; a greedy outer quantifier does not promote a
+lower-priority consuming alternative over a preferred empty iteration.
+
 The language does not define 256 as a maximum repetition bound. An
 implementation may impose ordinary compilation resource limits, but such a
 limit is not part of regex matching semantics. For a bounded repetition, `n`
@@ -384,6 +389,8 @@ alternatives and quantifier greediness.
 
 Repetition of an empty or nullable group is permitted. It must terminate, and
 it does not create input progress beyond the scalar values actually consumed.
+Its selected path is determined by the empty-iteration rule below, not by
+implementation-specific cycle detection or node deduplication.
 
 Examples:
 
@@ -408,6 +415,79 @@ lexmatch "ab" {
 }
 // x == "a"
 ```
+
+### 5.1 Nullable repetition and empty iterations
+
+An operand is nullable if it can match the empty string. An iteration is empty
+when the selected path through that operand consumes no input. A nullable
+operand can also have consuming paths; the mere possibility of an empty match
+does not terminate repetition.
+
+The following rules apply to first-match matching, including first-class
+`Regex` execution, `=~`, `lexmatch`, and `lexscan` with the default or explicit
+`first` strategy:
+
+1. At each repetition decision, a greedy quantifier tries another iteration
+   before its continuation; a non-greedy quantifier tries the continuation
+   first once its minimum count is satisfied. Within an iteration, the
+   operand MUST retain its own ordered alternatives and greedy or non-greedy
+   priorities.
+2. Each successful iteration counts toward the written lower and upper bounds,
+   including an empty iteration. The minimum count MUST be satisfied before
+   the repetition can finish. A zero maximum performs no iterations and does
+   not set captures inside the operand.
+3. For an unbounded repetition (`*`, `+`, or `{n,}`, including their non-greedy
+   forms), an empty iteration that satisfies the minimum count MUST finish
+   that repetition on the current path. No further optional iteration is
+   tried before its continuation. If an empty iteration occurs while the
+   minimum is still unmet, the remaining mandatory iterations MUST be tried;
+   once the minimum is met, the repetition finishes if that last iteration
+   is empty.
+4. An empty iteration does not commit the match. If the continuation fails,
+   matching MUST retry the remaining alternatives or repetition counts in
+   priority order, including consuming alternatives of the empty iteration.
+   Successful nested repetitions remain subject to the same rule independently.
+5. A bounded repetition (`?`, `{n}`, or `{n,m}`, including their non-greedy
+   forms) has finitely many iterations. An empty iteration MUST NOT override
+   its written bounds or quantifier priority; empty iterations may continue
+   until the selected count is reached.
+6. Captures MUST describe the final successful path. An empty iteration that
+   participates in that path is a real iteration: a capture enclosing the
+   operand denotes its empty final iteration, rather than its preceding
+   consuming iteration. Captures from abandoned attempts MUST NOT leak into
+   the selected result. Existing rules for nested capture participation still
+   apply.
+
+Here, the continuation includes the rest of the current operand's enclosing
+expressions and the rest of the regex. It is not limited to a literal suffix.
+These are observable path-selection rules; implementations need not use a
+backtracking engine. The empty-iteration rule is the rule used by
+[Perl-compatible PCRE2 repetition](https://www.pcre.org/current/doc/html/pcre2pattern.html#SEC17),
+not a claim that MoonBit supports every PCRE2 feature.
+
+Representative results (the remainder is the unmatched suffix):
+
+| Regex | Input | Selected match | Remainder |
+| --- | --- | --- | --- |
+| `^(?:\|a)*` | `"aa"` | `""` | `"aa"` |
+| `^(?:a\|)*` | `"aa"` | `"aa"` | `""` |
+| `^(?:a?\|b)*` | `"ab"` | `"a"` | `"b"` |
+| `^(?:a?\|b)*$` | `"ab"` | `"ab"` | `""` |
+| `^(?:\|a)*b` | `"aab"` | `"aab"` | `""` |
+| `^(?:a?b??)*` | `"ab"` | `"a"` | `"b"` |
+| `^(?:a?b??){2,}` | `"aab"` | `"aa"` | `"b"` |
+| `^(?:a*?b*?)*a` | `"baaa"` | `"ba"` | `"aa"` |
+
+In the last example, the initial empty iteration cannot satisfy the final
+`a` at the leading `b`, so matching retries the operand and consumes `b`.
+The next iteration selects empty; the repetition finishes and the final `a`
+consumes the first `a`. Consuming an additional `a` in the repeated operand
+before trying that successful continuation would change its internal priority.
+If the repeated operand and the final `a` are captured separately, their
+captures MUST be `"b"` and `"a"`, respectively.
+
+The rule belongs to first-match semantics. The `longest` strategy retains the
+maximal-match and capture-coherence contract in Section 6.
 
 ## 6. Longest-match semantics
 
