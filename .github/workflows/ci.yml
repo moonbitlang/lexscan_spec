@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format, types, and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: moon fmt --check
+      - run: moon check --deny-warn --target all
+      - run: bash scripts/check_format_fixture.sh
+      - run: bash scripts/check_coverage_ids.sh
+
+  runtime:
+    name: Tests (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [wasm, wasm-gc, js, native]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Debug tests
+        run: moon test --target ${{ matrix.target }} --deny-warn
+      - name: Release tests
+        run: moon test --target ${{ matrix.target }} --release --deny-warn
+
+  diagnostics:
+    name: Diagnostics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Check diagnostic fixtures
+        shell: bash
+        run: |
+          set -o pipefail
+          bash diagnostics/run.sh --allow-known-divergences | tee diagnostics.log
+      - name: Upload diagnostic results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics
+          path: diagnostics.log
+          if-no-files-found: ignore

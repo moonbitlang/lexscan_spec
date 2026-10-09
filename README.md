@@ -59,6 +59,18 @@ Individual layers can also be run with `moon test`,
 `bash diagnostics/run.sh`, `bash scripts/check_format_fixture.sh`, and
 `bash scripts/check_coverage_ids.sh`.
 
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatches.
+It installs the latest stable MoonBit toolchain and checks formatting, types,
+coverage IDs, diagnostic fixtures, and debug/release tests on `wasm`, `wasm-gc`,
+`js`, and `native`. Each run records the exact toolchain versions.
+
+The CI diagnostic runner uses `--allow-known-divergences` to report the two
+KI-002 surrogate escape fixtures as expected failures only when they exhibit
+the recorded `Moonc.Basic_utf8_decode.MalFormed` crash. Their normative
+expectations stay unchanged; every other diagnostic failure blocks CI.
+Diagnostic logs are uploaded even on failure. The default local runner stays
+strict, and a fixed compiler passes these fixtures normally.
+
 The diagnostic runner is intentionally strict. A baseline compiler that still
 has a divergence listed in
 [Known implementation issues and limitations](spec/08-known-implementation-issues.md)
