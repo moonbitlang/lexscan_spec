@@ -45,6 +45,25 @@ baseline toolchain accepts `\u{}` instead of rejecting it as an invalid regex.
 Acceptance of `\u{}` is an implementation defect. The conformance suite keeps
 this case as a required E4172 rejection.
 
+### KI-004: Nullable repetition selects a different first-match path
+
+Published toolchains do not consistently implement the empty-iteration rule
+in Section 5.1 of [Regex Patterns and Matching Model](01-regex-patterns.md).
+For example, automaton lowering selects `"baa"` for `^(?:a*?b*?)*a` on
+`"baaa"`, while library runtime lowering selects `"baaa"`. The required
+result is `"ba"`, leaving `"aa"`; neither observed result defines the
+language rule.
+
+Likewise, `^(?:a?|b)*` on `"ab"` must stop at `"a"` once the next iteration
+selects empty. The consuming `b` alternative is retried if a continuation such
+as `$` fails, rather than being promoted before a successful continuation.
+
+RX-012C and RX-012D keep the normative match, capture, and remainder assertions
+as blocking conformance tests across all regex backends. A compiler fallback
+to its automaton does not establish conformity with this rule. This issue is
+separate from diagnostic fixes that may be present in development compilers
+but absent from a published stable toolchain.
+
 ## 3. Implementation limits
 
 ### IL-001: Repetition bounds are limited to 256

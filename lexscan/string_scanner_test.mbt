@@ -187,6 +187,32 @@ test "LS-031 LS-032A empty match neither warns nor advances" {
 }
 
 ///|
+#warnings("-unused_lexcase")
+test "RX-012D StringScanner commits the first-match empty-iteration result" {
+  let scanner = @lexbuf.StringScanner::{ data: "baaa"[:], cursor: 0, }
+  lexscan scanner {
+    re"^(?:a*?b*?)*a" as word => assert_eq(word, "ba")
+    _ => fail("scanner did not match the nullable composite loop")
+  }
+  assert_eq(scanner.cursor, 2)
+  assert_eq(scanner.data[scanner.cursor:], "aa")
+
+  let first = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0, }
+  lexscan first {
+    re"^(?:a?|b)*" as word => assert_eq(word, "a")
+    _ => fail("first-match scanner did not stop after its empty iteration")
+  }
+  assert_eq(first.cursor, 1)
+
+  let longest = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0, }
+  lexscan longest with longest {
+    re"^(?:a?|b)*" as word => assert_eq(word, "ab")
+    _ => fail("longest scanner did not select the complete maximal match")
+  }
+  assert_eq(longest.cursor, 2)
+}
+
+///|
 fn count_until_eof(scanner : @lexbuf.StringScanner) -> Int {
   let mut count = 0
   for ;; {

@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 240 independently testable requirements. The
-ordinary runtime/type layer contains 132 tests; diagnostic fixtures and format
+The current matrix contains 241 independently testable requirements. The
+ordinary runtime/type layer contains 138 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
@@ -68,11 +68,15 @@ coverage IDs, diagnostic fixtures, and debug/release tests on `wasm`, `wasm-gc`,
 Each run records the exact toolchain versions, uses a separate build directory
 per regex backend, and runs release tests even if debug tests fail.
 
-The stable toolchain's core regex runtime currently violates RX-012C. These
-runtime failures remain blocking tests; they are not skipped or treated as
-expected failures. A compiler may fall back to its automaton for unsupported
-runtime patterns, so selecting `runtime` alone does not prove that every regex
-was lowered to a library call.
+RX-012C and RX-012D specify the first-match empty-iteration rule: an unbounded
+nullable repetition finishes after an empty iteration once its minimum is met,
+then retries other paths if its continuation fails. In particular,
+`^(?:a*?b*?)*a` on `"baaa"` must match `"ba"` and leave `"aa"`.
+Published automaton and library runtime implementations both have divergences
+from this rule, recorded as KI-004. These failures remain blocking tests; they
+are not skipped or treated as expected failures. A compiler may fall back to
+its automaton for unsupported runtime patterns, so selecting `runtime` alone
+does not prove that every regex was lowered to a library call.
 
 The CI diagnostic runner uses `--allow-known-divergences` to report the two
 KI-002 surrogate escape fixtures as expected failures only when they exhibit
