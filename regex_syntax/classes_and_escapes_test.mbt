@@ -23,6 +23,20 @@ test "RX-022 scalar range endpoints and Unicode ranges" {
 }
 
 ///|
+test "RX-022A literal colon ranges and escaped hyphen distinction" {
+  for scalar in [":", ";", "<", "=", ">", "?", "@"] {
+    assert_true(scalar =~ re"^[:-@]$")
+  }
+  assert_true(!("/" =~ re"^[:-@]$"))
+  assert_true(!("A" =~ re"^[:-@]$"))
+  assert_true(!("-" =~ re"^[:-@]$"))
+  for scalar in [":", "-", "@"] {
+    assert_true(scalar =~ re"^[:\-@]$")
+  }
+  assert_true(!(";" =~ re"^[:\-@]$"))
+}
+
+///|
 test "RX-024A scalar range crossing the surrogate interval" {
   assert_true("\u{d7ff}" =~ re"^[\u{d7ff}-\u{e000}]$")
   assert_true("\u{e000}" =~ re"^[\u{d7ff}-\u{e000}]$")

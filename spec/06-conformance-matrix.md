@@ -51,6 +51,7 @@ Priority labels:
 | RX-021 | P0 | positive and negated character classes | runtime |
 | RX-021A | P1 | `[]` is empty and `[^]` is the full scalar-value set | runtime |
 | RX-022 | P0 | scalar ranges, including non-ASCII ranges | runtime |
+| RX-022A | P1 | a literal colon can start a scalar range; its endpoints and interior match, while escaping the hyphen instead makes it a literal class atom | runtime |
 | RX-023 | P1 | descending range rejected | E4172 |
 | RX-024 | P1 | class-set endpoint range rejected | E4172 |
 | RX-024A | P1 | a scalar range crossing the surrogate interval contains only valid scalar values at and outside the interval | runtime |
