@@ -163,6 +163,17 @@ therefore grouped forms such as `(^){2}`, `(?:^)+`, and `(?i:^)?` are valid.
 Repeating such a group still consumes no input. As with every nullable
 repetition, evaluation MUST terminate without inventing input progress.
 
+Under first-match semantics, the initial iteration of an unbounded repetition
+preserves the ordered alternatives of its nullable operand. Repetition MUST
+avoid revisiting the same matching position without consuming input; suppressing
+such an empty cycle MUST NOT discard other consuming paths or reorder captures.
+For example, `re"^(?:|a)*"` on `"aa"` matches the empty string and leaves
+`"aa"` as the suffix; `re"^(?:a|)*"` consumes `"aa"`, while
+`re"^(?:|a)*b"` on `"aab"` consumes the two `a` characters to satisfy `b`.
+After input has been consumed, `re"^(?:a?|b)*"` on `"ab"` consumes both
+characters: the empty path through `a?` cannot repeatedly re-enter the operand
+ahead of the `b` alternative.
+
 The language does not define 256 as a maximum repetition bound. An
 implementation may impose ordinary compilation resource limits, but such a
 limit is not part of regex matching semantics. For a bounded repetition, `n`
