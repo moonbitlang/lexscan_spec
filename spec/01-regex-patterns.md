@@ -420,6 +420,8 @@ implementation MAY use any representation that selects the same result.
 - A greedy repeat/exit choice explores the repeat edge first. A non-greedy
   choice explores the exit edge first.
 - `R+` enters one mandatory copy of `R`, then reaches its repeat/exit choice.
+  The repeat edge returns to that same body and its same control points; it
+  does not create another copy of `R`.
 - If `R` is nullable, `R*` is constructed as `(R+)?`; `R*?` is constructed as
   `(R+?)??`. The inner and outer operators both preserve the written mode.
 - For `n >= 1`, `R{n,}` consists of `n - 1` mandatory copies followed by

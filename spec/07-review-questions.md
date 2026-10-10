@@ -10,7 +10,7 @@ Each question records only publicly reproducible behavior and the proposed
 specification choice. It intentionally contains no non-public development
 materials.
 
-RQ-001 through RQ-016 are resolved. The specification deliberately limits its
+RQ-001 through RQ-017 are resolved. The specification deliberately limits its
 target-input domain to well-formed UTF-16.
 
 ## 2. Decision summary
@@ -33,6 +33,7 @@ target-input domain to well-formed UTF-16.
 | RQ-014 | Resolved | Direct assertions cannot be quantified; grouped zero-width regexes can be quantified |
 | RQ-015 | Resolved | Capture decomposition among equal-end maximal paths is unspecified but must be coherent |
 | RQ-016 | Resolved | Targets are well-formed UTF-16; ill-formed targets are outside the spec |
+| RQ-017 | Resolved | Nullable repetition uses ordered-automaton construction and first-arrival priority |
 
 ## RQ-001: Unpaired UTF-16 surrogates
 
