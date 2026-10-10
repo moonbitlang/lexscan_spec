@@ -45,6 +45,18 @@ baseline toolchain accepts `\u{}` instead of rejecting it as an invalid regex.
 Acceptance of `\u{}` is an implementation defect. The conformance suite keeps
 this case as a required E4172 rejection.
 
+### KI-004: Runtime nullable repetition selects a different path
+
+The published stable toolchain can select different first-match results when
+library execution handles a nullable unbounded operand. For example,
+`^(?:a*?b*?)*a` on `"baaa"` selects `"baa"` with table/block compilation but
+the library runtime selects `"baaa"`. The required result is `"baa"`, leaving
+`"a"`, under Section 5.1's ordered-automaton policy.
+
+Repeated captures may also differ, even when the complete matched text agrees.
+The conformance tests assert the required result for every backend; nullable
+repetition failures are not skipped or accepted as expected failures in CI.
+
 ## 3. Implementation limits
 
 ### IL-001: Repetition bounds are limited to 256

@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 240 independently testable requirements. The
-ordinary runtime/type layer contains 129 tests; diagnostic fixtures and format
+The current matrix contains 242 independently testable requirements. The
+ordinary runtime/type layer contains 141 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
@@ -59,11 +59,29 @@ Individual layers can also be run with `moon test`,
 `bash diagnostics/run.sh`, `bash scripts/check_format_fixture.sh`, and
 `bash scripts/check_coverage_ids.sh`.
 
+GitHub Actions runs the suite with explicit `table`, `block`, and `runtime`
+regex lowering on `wasm`, `wasm-gc`, `js`, and `native`, in both debug and
+release mode. Each regex backend has its own build directory, and a focused
+nullable-repetition regression runs before the full tests. Failures of the
+required nullable policy remain blocking, including when the installed stable
+toolchain does not yet contain the corresponding runtime fix.
+
+The nullable policy is defined in
+[Section 5.1](spec/01-regex-patterns.md#51-nullable-repetition-priority):
+`^(?:a*?b*?)*a` on `baaa` matches `baa` and leaves `a`. It fixes repetition
+priority to the Go ordered-automaton policy without adopting the complete Go
+regex dialect.
+
 The diagnostic runner is intentionally strict. A baseline compiler that still
 has a divergence listed in
 [Known implementation issues and limitations](spec/08-known-implementation-issues.md)
 will fail the corresponding fixture until that compiler fix is available in
 the invoked toolchain.
+
+Stable-toolchain CI permits only the two KI-002 diagnostic fixtures that hit
+the recorded `Moonc.Basic_utf8_decode.MalFormed` crash signature. That allowance
+is separate from runtime matching; the default local diagnostic runner stays
+strict.
 
 To test a locally built compiler while keeping the installed `moon` driver,
 set `SPEC_MOONC_OVERRIDE`:

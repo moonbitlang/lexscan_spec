@@ -277,3 +277,19 @@ Inputs containing isolated high or low surrogates in the logical target are
 outside the language contract. Their matching, capture, cursor, refill, and
 error behavior is intentionally not specified, and no conformance test may
 depend on it.
+
+## RQ-017: First-match priority in nullable repetition
+
+Resolved: use the ordered-automaton construction and first-arrival rule in
+Section 5.1 of
+[Regex Patterns and Matching Model](01-regex-patterns.md#51-nullable-repetition-priority).
+Nullable star is a same-mode optional plus, plus enters its body before its
+repeat/exit choice, and each control point is entered at most once per input
+position. Finite copies have distinct control points.
+
+Thus `^(?:a*?b*?)*a` on `"baaa"` MUST match `"baa"` and leave `"a"`.
+`^(?<item>a?)*$` on `"a"` retains the captured `"a"`, whereas
+`^(?:(?<item>a*?b*?)*a){2}` on `"baaaa"` records an empty final `item`.
+This fixes the nullable-repetition choice to the Go policy without requiring
+general compatibility with the rest of Go's regex dialect. An empty iteration
+does not introduce a separate rule that immediately forces the continuation.
