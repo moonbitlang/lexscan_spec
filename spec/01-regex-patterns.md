@@ -409,6 +409,62 @@ lexmatch "ab" {
 // x == "a"
 ```
 
+### 5.1 Nullable repetition priority
+
+A nullable operand can match without consuming a scalar. Its unbounded
+repetition uses ordered-automaton priority, including the match end and all
+captures. The following conceptual construction defines that priority; an
+implementation MAY use any representation that selects the same result.
+
+- Alternatives are explored from left to right.
+- A greedy repeat/exit choice explores the repeat edge first. A non-greedy
+  choice explores the exit edge first.
+- `R+` enters one mandatory copy of `R`, then reaches its repeat/exit choice.
+  The repeat edge returns to that same body and its same control points; it
+  does not create another copy of `R`.
+- If `R` is nullable, `R*` is constructed as `(R+)?`; `R*?` is constructed as
+  `(R+?)??`. The inner and outer operators both preserve the written mode.
+- For `n >= 1`, `R{n,}` consists of `n - 1` mandatory copies followed by
+  `R+`; `R{n,}?` uses `R+?` for the last part. `R{0,}` and `R{0,}?` use the
+  corresponding star construction.
+- Finite bounds consist of separate mandatory copies and a finite chain of
+  ordered optional copies. Their control points are distinct, even if two
+  copies have identical contents.
+
+At each input position, empty transitions are explored in priority order. Each
+control point is entered at most once at that position. The first arrival
+keeps its capture state; later arrivals at that same control point and position
+are discarded. Consuming a scalar creates a new input position with a fresh
+set of entered control points. This suppresses empty cycles without adding
+input progress or moving lower-priority paths ahead of remaining preferred
+paths.
+
+Reaching an empty iteration does not universally force an immediate exit or
+replace the last captured iteration with an empty capture. A continuation
+which fails still leaves the other permitted paths available. Captures belong
+to the selected complete path after the control-point rule above is applied.
+These rules apply equally to `=~`, `lexmatch`, `lexscan` with `first`, and
+first-class `Regex` execution. `longest` retains Section 6's separate contract.
+
+For example:
+
+| Pattern | Input | Match | Remaining input | Captures |
+| --- | --- | --- | --- | --- |
+| `^(?:\|a)*` | `aa` | empty | `aa` | none |
+| `^(?:a\|)*` | `aa!` | `aa` | `!` | none |
+| `^(?:a*?b*?)*a` | `baaa` | `baa` | `a` | none |
+| `^(?<body>(?<item>a*?b*?))*(?<tail>a)` | `baaa` | `baa` | `a` | `body`, `item`, and `tail` are `a` |
+| `^(?<item>a?)*$` | `a` | `a` | empty | `item` is `a` |
+| `^(?:(?<item>a*?b*?)*a){2}` | `baaaa` | `baaa` | `a` | `item` is empty |
+
+In the last example, the final empty capture belongs to a distinct finite copy;
+it is not suppressed as another arrival at the first copy's control point.
+The policy is the one used for nullable repetition by Go's `regexp` package,
+but it does not adopt unrelated Go syntax, Unicode, or longest-match behavior.
+The reference construction and closure order can be inspected in Go's
+[regexp compiler](https://go.dev/src/regexp/syntax/compile.go) and
+[regexp execution](https://go.dev/src/regexp/exec.go).
+
 ## 6. Longest-match semantics
 
 The longest strategy is maximal munch from the beginning of the logical input.

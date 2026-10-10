@@ -1,6 +1,6 @@
 ///|
 test "LS-002 LS-028 AsyncLexbuf accepts a token across asynchronous refills" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["ab", "cd", "!"]
@@ -33,7 +33,7 @@ test "LS-002 LS-028 AsyncLexbuf accepts a token across asynchronous refills" {
 
 ///|
 test "LS-008C AsyncLexbuf target expression is evaluated exactly once" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut target_evaluations = 0
     let mut supplied = false
@@ -64,7 +64,7 @@ test "LS-008C AsyncLexbuf target expression is evaluated exactly once" {
 
 ///|
 test "LS-025 AsyncLexbuf ignores empty chunks" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["", "a", ""]
@@ -91,7 +91,7 @@ test "LS-025 AsyncLexbuf ignores empty chunks" {
 
 ///|
 test "LS-025A LS-027B AsyncLexbuf skips empty runs through EOF" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["", "", "a", "", "b", "", ""]
@@ -118,7 +118,7 @@ test "LS-025A LS-027B AsyncLexbuf skips empty runs through EOF" {
 
 ///|
 test "LS-020 LS-021 AsyncLexbuf catch-all handles EOF without consuming" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let input = @lexbuf.AsyncLexbuf::from_fn(async fn() noraise {
       scheduler.pause()
@@ -137,7 +137,7 @@ test "LS-020 LS-021 AsyncLexbuf catch-all handles EOF without consuming" {
 
 ///|
 test "LS-021A AsyncLexbuf catch-all repeats on an unmatched scalar" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut supplied = false
     let input = @lexbuf.AsyncLexbuf::from_fn(async fn() noraise {
@@ -164,7 +164,7 @@ test "LS-021A AsyncLexbuf catch-all repeats on an unmatched scalar" {
 
 ///|
 test "LS-019C AsyncLexbuf wildcard-only does not refill" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(() => {
     let mut source_calls = 0
     let input = @lexbuf.AsyncLexbuf::from_fn(async fn() noraise {
@@ -185,7 +185,7 @@ test "LS-019C AsyncLexbuf wildcard-only does not refill" {
 
 ///|
 test "LS-015A AsyncLexbuf commits before body evaluation" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["a", "b"]
@@ -214,7 +214,7 @@ test "LS-015A AsyncLexbuf commits before body evaluation" {
 
 ///|
 test "LS-027A AsyncLexbuf dollar waits for true EOF" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["ab", "!"]
@@ -262,7 +262,7 @@ test "LS-027A AsyncLexbuf dollar waits for true EOF" {
 
 ///|
 test "LS-027C AsyncLexbuf failed dollar match restores cursor after refill" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["a", "b", "!", "", ""]
@@ -297,7 +297,7 @@ test "LS-027C AsyncLexbuf failed dollar match restores cursor after refill" {
 
 ///|
 test "LS-013B AsyncLexbuf longest selection across refills" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["a", "b", "c", "d", "!"]
@@ -325,7 +325,7 @@ test "LS-013B AsyncLexbuf longest selection across refills" {
 
 ///|
 test "LS-013C AsyncLexbuf ambiguous maximal captures are coherent" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["a", "", "a"]
@@ -354,7 +354,7 @@ test "LS-013C AsyncLexbuf ambiguous maximal captures are coherent" {
 
 ///|
 test "LS-035A LS-035B AsyncLexbuf retains captures after later refills" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut index = 0
     let chunks : ReadOnlyArray[String] = ["ab", "cd", " ", "ef", "gh", "!"]
@@ -397,7 +397,7 @@ test "LS-035A LS-035B AsyncLexbuf retains captures after later refills" {
 
 ///|
 test "LS-039 AsyncLexbuf zero-length success and EOF" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let mut supplied = false
     let input = @lexbuf.AsyncLexbuf::from_fn(async fn() noraise {
@@ -437,7 +437,7 @@ test "LS-039 AsyncLexbuf zero-length success and EOF" {
 
 ///|
 test "LS-034A AsyncLexbuf joins a split non-BMP scalar" {
-  let scheduler = TestScheduler::new()
+  let scheduler = @lexscan.TestScheduler::new()
   scheduler.run_async(async fn() {
     let source = "😀"
     let chunks : ReadOnlyArray[String] = [

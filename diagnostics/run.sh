@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ALLOW_KNOWN_DIVERGENCES=0
+if [[ "${1:-}" == "--allow-known-divergences" && $# -eq 1 ]]; then
+  ALLOW_KNOWN_DIVERGENCES=1
+elif [[ $# -ne 0 ]]; then
+  echo "Usage: $0 [--allow-known-divergences]" >&2
+  exit 2
+fi
+
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 FIXTURES="$ROOT/diagnostics/fixtures"
 MANIFEST="$ROOT/diagnostics/fixtures.tsv"
 FAILED=0
 PASSED=0
+KNOWN=0
 
 make_project() {
   local dir=$1
@@ -97,6 +106,15 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
   if [[ $case_ok -eq 1 ]]; then
     echo "PASS $name"
     PASSED=$((PASSED + 1))
+  elif [[ $ALLOW_KNOWN_DIVERGENCES -eq 1 ]] &&
+    [[ "$name" == "rx_isolated_surrogate" || "$name" == "rx_surrogate_pair_escape_runtime" ]] &&
+    grep -Fq 'Error: Moonc.Basic_utf8_decode.MalFormed' "$output"; then
+    # KI-002: permit only the recorded crash signature in stable-toolchain CI.
+    echo "XFAIL $name: KI-002 surrogate escape compiler crash"
+    KNOWN=$((KNOWN + 1))
+    if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+      echo "::warning::KI-002: $name hit the known surrogate escape compiler crash"
+    fi
   else
     sed -n '1,160p' "$output"
     FAILED=$((FAILED + 1))
@@ -104,5 +122,5 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
   rm -rf "$tmp"
 done < "$MANIFEST"
 
-echo "Diagnostic fixtures: $PASSED passed, $FAILED failed"
+echo "Diagnostic fixtures: $PASSED passed, $KNOWN known divergences, $FAILED failed"
 [[ $FAILED -eq 0 ]]
