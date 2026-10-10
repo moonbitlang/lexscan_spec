@@ -5,7 +5,7 @@ pub fn chunked(chunks : Array[String]) -> @lexbuf.Lexbuf {
 }
 
 ///|
-pub async fn[T] spec_suspend(register : ((T) -> Unit) -> Unit) -> T noraise = "%async.suspend"
+pub async fn[T] spec_suspend(register : ((T) -> Unit) -> Unit) -> T noraise + nocancel = "%async.suspend"
 
 ///|
 pub fn spec_run_async(work : async () -> Unit noraise) -> Unit = "%async.run"
