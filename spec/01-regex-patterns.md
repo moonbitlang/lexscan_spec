@@ -243,10 +243,11 @@ construct a regex dynamically.
 Inside a character class, `\b` denotes backspace and `\-` denotes a literal
 hyphen.
 
-A Unicode escape sequence MUST NOT denote an isolated value in the surrogate
-range U+D800 through U+DFFF because such a value is not a Unicode scalar value.
-A well-formed high-surrogate/low-surrogate pair, and the equivalent scalar-value
-escape such as `\u{1f600}`, denote one non-BMP scalar value.
+Each Unicode escape sequence MUST denote a Unicode scalar value. Both fixed
+and braced escapes in the surrogate range U+D800 through U+DFFF are invalid,
+inside and outside character classes. Adjacent high-surrogate/low-surrogate
+escapes are not combined: `\uD83D\uDE00` is invalid. Use a literal non-BMP
+character or a braced scalar escape such as `\u{1f600}` instead.
 
 ### 3.6 Unsupported constructs
 

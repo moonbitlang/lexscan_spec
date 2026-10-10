@@ -29,13 +29,15 @@ portable way to establish semantic anchoring.
 An isolated surrogate is not a Unicode scalar value and cannot be expressed by
 the regex language. Such a regex must be rejected as invalid.
 
-The baseline toolchain accepts isolated surrogate escapes rather than issuing a
-normal invalid-regex diagnostic. A high-surrogate escape followed by a
-low-surrogate escape also fails to match the corresponding non-BMP scalar.
+The compiler regex parser may accept surrogate escapes rather than issuing a
+normal invalid-regex diagnostic. This includes adjacent high/low escape pairs,
+which are also invalid under the specification. On the tested toolchain,
+`input =~ re"\uD800"` and `input =~ re"^\uD83D\uDE00$"` can instead trigger
+an internal UTF-8 decoding error in the literal matching optimization.
 
-Both behaviors are implementation defects. They do not make an isolated
-surrogate a valid regex value, and a well-formed pair remains one scalar value
-under the specification.
+The core runtime regex parser rejects these surrogate escapes, consistent with
+the specification. The compiler must also reject them normally with E4172;
+acceptance or an internal compiler error remains an implementation defect.
 
 ### KI-003: An empty braced Unicode escape is accepted
 

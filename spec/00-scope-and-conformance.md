@@ -74,10 +74,13 @@ well-formed UTF-16 input, the surface regex language denotes sequences of
 Unicode scalar values. Literal characters, `.`, character classes, repetition,
 alternation, and captures are defined at that level.
 
-The regex language cannot express an isolated UTF-16 surrogate. A literal or
-Unicode escape sequence MUST NOT denote a lone high or low surrogate. A
-well-formed surrogate pair denotes its single non-BMP scalar value in the usual
-way.
+The regex language cannot express a UTF-16 surrogate as a pattern atom. Each
+Unicode escape MUST denote a Unicode scalar value; escapes in U+D800 through
+U+DFFF are invalid, even when a high-surrogate escape is immediately followed
+by a low-surrogate escape. Non-BMP scalars are written as literal characters or
+braced scalar escapes such as `\u{1f600}`. A valid surrogate pair in the input
+string represents one non-BMP scalar; it does not make surrogate escapes valid
+in the pattern.
 
 MoonBit strings and string views are indexed internally in UTF-16 code units.
 The following UTF-16 and character-matching behavior is observable:

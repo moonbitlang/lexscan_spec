@@ -24,7 +24,8 @@ invalid. Conditions include:
 - a malformed or unsupported escape;
 - a quantifier without an atom;
 - a quantifier applied to `^` or `$`;
-- a Unicode escape for an isolated surrogate;
+- a Unicode escape in the surrogate range, including adjacent high/low
+  surrogate escapes;
 - a repetition minimum greater than its maximum;
 - a descending character range;
 - a range over character sets;
