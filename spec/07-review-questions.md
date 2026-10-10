@@ -17,7 +17,7 @@ target-input domain to well-formed UTF-16.
 
 | ID | Status | Decision area |
 | --- | --- | --- |
-| RQ-001 | Resolved | A regex cannot express an isolated surrogate |
+| RQ-001 | Resolved | Regex Unicode escapes denote scalars, not surrogate code units |
 | RQ-002 | Resolved | Direct anchors cannot be quantified |
 | RQ-003 | Resolved | Non-final `lexmatch` binder catch-all uses E4171 |
 | RQ-004 | Resolved | Source case order precedes per-case leftmost matching |
@@ -34,11 +34,13 @@ target-input domain to well-formed UTF-16.
 | RQ-015 | Resolved | Capture decomposition among equal-end maximal paths is unspecified but must be coherent |
 | RQ-016 | Resolved | Targets are well-formed UTF-16; ill-formed targets are outside the spec |
 
-## RQ-001: Unpaired UTF-16 surrogates
+## RQ-001: Unicode scalar escapes and UTF-16 surrogates
 
-Resolved: a regex cannot express an isolated UTF-16 surrogate. A Unicode escape
-sequence that denotes a lone surrogate is invalid. A well-formed surrogate pair
-continues to denote one non-BMP Unicode scalar value.
+Resolved: each regex Unicode escape must denote a Unicode scalar value. Fixed
+and braced surrogate escapes are invalid, including adjacent high/low escape
+pairs; the parser does not combine them. Non-BMP scalars use literal characters
+or braced scalar escapes such as `\u{1f600}`. Valid surrogate pairs in input
+strings continue to denote one non-BMP scalar.
 
 The target-input boundary for ill-formed strings is resolved separately by
 RQ-016: such logical targets are outside this specification.

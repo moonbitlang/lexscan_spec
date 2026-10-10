@@ -44,7 +44,7 @@ rx_quantified_end_plus	error	E4172	-	-
 rx_quantified_end_star	error	E4172	-	-
 rx_quantified_end_bounded	error	E4172	-	-
 rx_isolated_surrogate	error	E4172	-	-
-rx_surrogate_pair_escape_runtime	runtime	-	-	-
+rx_surrogate_pair_escape	error	E4172	-	-
 rx_interpolation_not_escape	error	-	-	-
 rx_interpolation_attempt	error	-	-	-
 rx_leading_hyphen	error	E4172	-	-

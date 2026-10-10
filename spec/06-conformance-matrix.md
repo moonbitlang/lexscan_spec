@@ -66,7 +66,7 @@ Priority labels:
 | RX-030 | P0 | control, character-class NUL, hex, fixed Unicode, and braced Unicode escapes | runtime |
 | RX-031 | P1 | malformed escape variants rejected with precise primary error | E4172 |
 | RX-031A | P1 | incomplete, non-hex, unclosed, empty, overflow, and invalid-control escape variants are rejected | E4172 |
-| RX-031B | P1 | isolated-surrogate Unicode escapes are rejected while well-formed non-BMP scalars remain valid | E4172 + runtime |
+| RX-031B | P1 | fixed and braced surrogate escapes are rejected, including adjacent high/low escape pairs; literal non-BMP scalars and braced scalar escapes remain valid | E4172 + runtime |
 | RX-031C | P1 | scalar boundary values U+D7FF, U+E000, and U+10FFFF are expressible, while both fixed and braced isolated-surrogate forms are rejected | runtime + E4172 |
 | RX-031D | P1 | regex interpolation is not a pattern feature; an attempted interpolation is rejected rather than evaluated | parse/typing negative |
 | RX-031E | P1 | empty, digit-leading, punctuation-containing, and unclosed named-capture identifiers are rejected | E4172 |
