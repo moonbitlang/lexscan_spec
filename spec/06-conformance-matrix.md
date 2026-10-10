@@ -38,6 +38,8 @@ Priority labels:
 | RX-012 | P0 | `*`, `+`, `?`, `{n}`, `{n,}`, `{n,m}` | runtime |
 | RX-012A | P1 | quantifiers apply to literals, classes, and groups; greedy paths backtrack when required; zero bounds and leading-zero counts are accepted | runtime |
 | RX-012B | P1 | repetition of empty and nullable groups terminates and preserves first-match greediness without inventing progress | runtime |
+| RX-012C | P1 | nullable repetition uses ordered-automaton priority for alternatives, greedy/lazy loops, mandatory and finite counts, continuation retries, EOF, and nesting | runtime |
+| RX-012D | P1 | nullable repetition preserves selected-path captures across first-class Regex execution, regex-match expressions, sliced and Unicode targets, and scanner cursor commits | runtime |
 | RX-014 | P1 | a quantifier without an operand, a repeated quantifier, and malformed bounded-quantifier spellings are rejected | E4172 |
 | RX-014A | P1 | stray regex metacharacters that cannot begin an atom are rejected | E4172 |
 | RX-015 | P1 | minimum greater than maximum rejected | E4172 |
