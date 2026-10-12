@@ -1,2 +1,2 @@
-// RX-031
+// RX-031 RX-049
 const DUPLICATE = re"(?<name>a)(?<name>b)"

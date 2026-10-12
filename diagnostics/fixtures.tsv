@@ -114,3 +114,6 @@ rx_posix_stray_hyphen	error	E4172	-	-
 rx_class_range_intersection	error	E4172	-	-
 rx_class_unescaped_range_end	error	E4172	-	-
 rx_unterminated_range	error	E4172	-	-
+rx_duplicate_named_alternative	error	E4172	-	-
+rx_duplicate_named_nested	error	E4172	-	-
+rx_group_nesting	error	E4172	-	-

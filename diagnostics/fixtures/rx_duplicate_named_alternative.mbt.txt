@@ -1,0 +1,2 @@
+// RX-049
+const DUPLICATE = re"(?<x>a)|(?<x>b)"

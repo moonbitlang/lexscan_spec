@@ -62,3 +62,28 @@ The baseline toolchain rejects a written repetition bound greater than 256.
 This is a compilation limit, not a language-level regex limit. Other conforming
 implementations are not required to use the same number, and the conformance
 suite must not use 256 versus 257 as a semantic boundary.
+
+### IL-002: Group nesting is limited to 128
+
+The parser referenced by core PR #4373 limits simultaneously open groups to
+128. All group forms count, while sequential groups do not accumulate depth.
+The 129th open group produces a normal parser error. Other implementations MAY
+choose a different resource limit; stack overflow or a process abort is not an
+acceptable way to report excessive nesting.
+
+The RX-051 boundary probes check this referenced parser's resource limit;
+128 versus 129 is not a portable matching-semantic distinction.
+
+## 4. Shared parser alignment
+
+[Core PR #4373](https://github.com/moonbitlang/core/pull/4373) corrects runtime
+parsing of control/NUL/hex escapes, Unicode surrogate escapes, leading zeros in
+braced escapes, invalid class escapes and ranges, reserved class punctuation,
+duplicate capture names, unterminated ranges, and excessive group nesting.
+The associated conformance cases require that change and the corresponding
+compiler update. Failures on the baseline toolchain remain visible; the suite
+does not reinterpret old parser behavior as the contract.
+
+Case folding of a negated class remains a separate known issue described in
+that PR: both implementations can match `a` and `A` with `(?i:[^a])` because
+folding occurs after negation. That behavior is not resolved by parser alignment.

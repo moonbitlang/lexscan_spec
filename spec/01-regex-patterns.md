@@ -283,7 +283,21 @@ escaping has been decoded. For example, the source string `"\\x41"` passes
 the regex escape `\x41` to the runtime parser. The surface-lexer restriction
 on `\{` applies to `re"..."`; a runtime pattern can escape a literal brace.
 
-### 3.6 Unsupported constructs
+### 3.6 Group validation and parser limits
+
+Named capture identifiers use `[A-Za-z_][A-Za-z0-9_]*`. Names MUST be unique
+throughout one regex, including across alternative branches and nested groups.
+Both `(?<x>a)(?<x>b)` and `(?<x>a)|(?<x>b)` are invalid. This is separate from
+the restriction on named groups in direct lexical patterns in Section 4.3.
+
+An implementation MAY impose a nesting resource limit. The parser version
+referenced in Section 1 of the scope document accepts 128 simultaneously open
+groups and rejects a 129th. Capturing, non-capturing, and modifier groups all
+count; sequential groups do not add to nesting depth. Excessive nesting MUST
+produce a normal invalid-pattern error rather than a stack overflow. The exact
+limit is documented as IL-002 and is not a matching-semantic boundary.
+
+### 3.7 Unsupported constructs
 
 The following constructs are rejected by the current regex parser:
 
@@ -301,7 +315,7 @@ rejects the deprecated `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` shorthands
 with a POSIX-class hint. These are explicit differences from compiled literals;
 they do not change the shared character-escape and class rules above.
 
-### 3.7 Semantic anchoring
+### 3.8 Semantic anchoring
 
 Start and end anchoring are properties of the complete compiled regex, not
 textual checks for the first or last character of a literal.
