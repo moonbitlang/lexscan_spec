@@ -1,0 +1,2 @@
+// RX-032B RX-048
+const RANGE_INTERSECTION = re"[!-&&]"

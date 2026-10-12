@@ -109,3 +109,8 @@ ls_case_errors	error	E4014	-	lexbuf
 ls_exhaustiveness_edges	error	E4224	-	lexbuf
 ls_indirect_lexbuf	error	E4037	-	special
 rx_class_unknown_escape	error	E4172	-	-
+rx_stray_hyphen	error	E4172	-	-
+rx_posix_stray_hyphen	error	E4172	-	-
+rx_class_range_intersection	error	E4172	-	-
+rx_class_unescaped_range_end	error	E4172	-	-
+rx_unterminated_range	error	E4172	-	-

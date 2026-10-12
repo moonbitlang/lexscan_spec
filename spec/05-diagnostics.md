@@ -31,6 +31,8 @@ invalid. Conditions include:
 - an unsupported POSIX class;
 - lookaround, backreferences, or word-boundary assertions;
 - character-class set intersection or subtraction;
+- a hyphen that does not separate individual range endpoints, or a reserved
+  unescaped `[` at a range endpoint;
 - a malformed group modifier;
 - duplicate named captures in a first-class regex literal; and
 - a non-greedy quantifier under the `longest` strategy.
@@ -38,6 +40,11 @@ invalid. Conditions include:
 Unpaired surrogate escapes and adjacent fixed high/low surrogate escapes are
 valid under the shared escape rules and MUST NOT be rejected merely for naming
 surrogate code points.
+
+Runtime `@string.Regex` rejects invalid patterns by raising its parser error;
+compiler diagnostic codes such as E4172 do not apply to runtime construction.
+An unterminated range such as `[a-` MUST raise that error rather than abort the
+program.
 
 ### E4181 — Named capture in a direct lexical regex literal
 

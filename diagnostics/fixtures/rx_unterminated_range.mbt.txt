@@ -1,0 +1,2 @@
+// RX-050
+const UNTERMINATED_RANGE = re"[a-"

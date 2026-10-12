@@ -1,0 +1,3 @@
+// RX-048
+const POSIX_THEN_HYPHEN = re"[[:digit:]-a]"
+const POSIX_TRAILING_HYPHEN = re"[[:digit:]-]"
