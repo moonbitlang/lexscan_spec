@@ -1,2 +1,10 @@
 // RX-031F
 const NUL_OUTSIDE_CLASS = re"\0"
+const HIGH_SURROGATE_IN_CLASS = re"[\uD800]"
+const LOW_SURROGATE_IN_CLASS = re"[\u{DFFF}]"
+
+test {
+  assert_true("\u{0}" =~ NUL_OUTSIDE_CLASS)
+  assert_true(!("😀" =~ HIGH_SURROGATE_IN_CLASS))
+  assert_true(!("" =~ LOW_SURROGATE_IN_CLASS))
+}
