@@ -39,12 +39,11 @@ invalid. Conditions include:
 
 Unpaired surrogate escapes and adjacent fixed high/low surrogate escapes are
 valid under the shared escape rules and MUST NOT be rejected merely for naming
-surrogate code points.
-
-Runtime `@string.Regex` rejects invalid patterns by raising its parser error;
-compiler diagnostic codes such as E4172 do not apply to runtime construction.
-An unterminated range such as `[a-` MUST raise that error rather than abort the
-program.
+surrogate code points. A parser resource limit, including excessive group
+nesting, MUST also be reported normally. Runtime `@string.Regex` rejects
+invalid patterns by raising its parser error; compiler diagnostic codes such
+as E4172 do not apply to runtime construction. An unterminated range such as
+`[a-` MUST raise that error rather than abort the program.
 
 ### E4181 — Named capture in a direct lexical regex literal
 
