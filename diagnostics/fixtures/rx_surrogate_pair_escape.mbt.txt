@@ -1,8 +1,5 @@
 // RX-031B
-fn invalid_adjacent_surrogate_escapes(input : String) -> Bool {
-  input =~ re"^\uD83D\uDE00$"
-}
-
-fn invalid_adjacent_surrogate_escapes_in_class(input : String) -> Bool {
-  input =~ re"^[\uD83D\uDE00]$"
+test {
+  assert_true("😀" =~ re"^\uD83D\uDE00$")
+  assert_true("😀" =~ re"^[\uD83D\uDE00]$")
 }

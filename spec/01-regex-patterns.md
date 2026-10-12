@@ -226,7 +226,8 @@ Supported character escapes include:
   backreference;
 - `\xHH` with exactly two hexadecimal digits;
 - `\uHHHH` with exactly four hexadecimal digits;
-- `\u{H...}` for a scalar value no greater than U+10FFFF; and
+- `\u{H...}` with one or more hexadecimal digits and a numeric value no
+  greater than U+10FFFF; any number of leading zeros is allowed; and
 - escapes for regex punctuation such as `^ $ \\ . * + ? ( ) [ ] } | / "`.
 
 An escape of an otherwise ordinary character is invalid. A literal `{` MUST be
@@ -243,11 +244,30 @@ construct a regex dynamically.
 Inside a character class, `\b` denotes backspace and `\-` denotes a literal
 hyphen.
 
-Each Unicode escape sequence MUST denote a Unicode scalar value. Both fixed
-and braced escapes in the surrogate range U+D800 through U+DFFF are invalid,
-inside and outside character classes. Adjacent high-surrogate/low-surrogate
-escapes are not combined: `\uD83D\uDE00` is invalid. Use a literal non-BMP
-character or a braced scalar escape such as `\u{1f600}` instead.
+Adjacent fixed-width escapes for a high surrogate U+D800 through U+DBFF and a
+low surrogate U+DC00 through U+DFFF MUST combine into one code point, inside
+or outside a class, including at a range endpoint. Thus `\uD83D\uDE00`
+matches `😀`, and `[\uD83D\uDE00-\uD83D\uDE4F]` is the range U+1F600
+through U+1F64F. Braced escapes do not participate in this combination.
+
+An unpaired surrogate escape, fixed or braced, is valid but matches no scalar
+value. It does not match the empty string. A surrogate code point may be a
+range endpoint; the resulting set MUST exclude U+D800 through U+DFFF. For
+example, `[\u0000-\uDFFF]` contains U+0000 through U+D7FF,
+`[\uD800-\uFFFF]` contains U+E000 through U+FFFF, `[a\uD83D]` contains only
+`a`, and `[^\uD800]` contains every scalar. A range with descending code-point
+endpoints remains invalid even if both endpoints are surrogates.
+
+The shared rules apply to runtime construction with `@string.Regex` and to a
+first-class literal such as `let r : Regex = re"[^\uD7FF]"`. Construction of a
+valid literal MUST preserve its character set when the compiler serializes it
+for the runtime parser; it MUST NOT fail because the serialized range has a
+surrogate endpoint.
+
+Runtime construction takes an ordinary `StringView`, after MoonBit string
+escaping has been decoded. For example, the source string `"\\x41"` passes
+the regex escape `\x41` to the runtime parser. The surface-lexer restriction
+on `\{` applies to `re"..."`; a runtime pattern can escape a literal brace.
 
 ### 3.6 Unsupported constructs
 

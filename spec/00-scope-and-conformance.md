@@ -17,6 +17,11 @@ same behavior. Confirmed divergences in the baseline implementation are kept in
 and are not normative. Non-public development materials are intentionally
 excluded from this specification.
 
+The shared escape and character-class contract also incorporates
+[core PR #4373](https://github.com/moonbitlang/core/pull/4373), at commit
+`bd192be7e35b21f542bc4c63f8a4adfed1f06069`. That change requires a corresponding
+compiler update; the baseline release is not claimed to implement it.
+
 ## 2. Normative terminology
 
 The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are
@@ -47,9 +52,11 @@ This specification covers:
 - compile-time restrictions, errors, and warnings; and
 - Unicode and UTF-16 behavior visible to MoonBit programs.
 
-First-class `Regex` values and runtime methods such as `Regex::execute` are in
-scope only where their construction or capture metadata affects a regex pattern
-used by one of the three expressions.
+First-class `Regex` values and runtime construction with `@string.Regex` are in
+scope for the shared character escapes, character classes, group syntax, and
+capture metadata. These rules must agree with compiled regex literals. Runtime
+APIs unrelated to that shared contract remain outside this specification, as
+does bytes-mode regex matching.
 
 ## 4. Features out of scope
 
@@ -74,13 +81,13 @@ well-formed UTF-16 input, the surface regex language denotes sequences of
 Unicode scalar values. Literal characters, `.`, character classes, repetition,
 alternation, and captures are defined at that level.
 
-The regex language cannot express a UTF-16 surrogate as a pattern atom. Each
-Unicode escape MUST denote a Unicode scalar value; escapes in U+D800 through
-U+DFFF are invalid, even when a high-surrogate escape is immediately followed
-by a low-surrogate escape. Non-BMP scalars are written as literal characters or
-braced scalar escapes such as `\u{1f600}`. A valid surrogate pair in the input
-string represents one non-BMP scalar; it does not make surrogate escapes valid
-in the pattern.
+Unicode escapes may name code points in U+0000 through U+10FFFF, including the
+surrogate interval U+D800 through U+DFFF. Adjacent fixed-width high/low
+surrogate escapes combine into one non-BMP scalar: `\uD83D\uDE00` is equivalent
+to `\u{1f600}`. An unpaired surrogate escape is accepted but matches no scalar;
+it may also be a range endpoint. Character classes, their complements, and
+ranges are intersected with the Unicode scalar-value domain. See
+[Regex patterns, Section 3.5](01-regex-patterns.md#35-escapes).
 
 MoonBit strings and string views are indexed internally in UTF-16 code units.
 The following UTF-16 and character-matching behavior is observable:
@@ -99,8 +106,7 @@ surrogates are outside the specified input domain. This specification does not
 define matching, capture, cursor, refill, or error behavior for such targets.
 A conforming implementation is not required to provide portable behavior for
 them, and conformance tests MUST NOT depend on such behavior. This does not
-change the separate rule that a regex itself cannot express an isolated
-surrogate.
+change the rule that an unpaired surrogate escape in a regex matches no scalar.
 
 ### 5.2 Input boundaries
 
