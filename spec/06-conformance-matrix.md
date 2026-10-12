@@ -63,14 +63,14 @@ Priority labels:
 | RX-028 | P1 | unsupported POSIX class rejected | E4172 |
 | RX-028A | P1 | an unclosed POSIX character class is rejected | E4172 |
 | RX-029 | P1 | `\d`/`\s`/`\w` families accepted with E0027 | warning + runtime |
-| RX-030 | P0 | control, character-class NUL, hex, fixed Unicode, and braced Unicode escapes | runtime |
+| RX-030 | P0 | control, NUL inside and outside classes, hex, fixed Unicode, and braced Unicode escapes | runtime |
 | RX-031 | P1 | malformed escape variants rejected with precise primary error | E4172 |
 | RX-031A | P1 | incomplete, non-hex, unclosed, empty, overflow, and invalid-control escape variants are rejected | E4172 |
 | RX-031B | P1 | adjacent fixed-width high/low surrogate escapes combine into one non-BMP scalar, including in classes and range endpoints | runtime |
 | RX-031C | P1 | Unicode scalar boundaries remain expressible; unpaired fixed/braced surrogate escapes match no scalar or empty string, and surrogate range endpoints are intersected with the scalar domain | runtime |
 | RX-031D | P1 | regex interpolation is not a pattern feature; an attempted interpolation is rejected rather than evaluated | parse/typing negative |
 | RX-031E | P1 | empty, digit-leading, punctuation-containing, and unclosed named-capture identifiers are rejected | E4172 |
-| RX-031F | P1 | `\0` outside a class is an unsupported numeric backreference, while an isolated-surrogate escape is invalid inside a class as well as outside it | E4172 |
+| RX-031F | P1 | NUL is accepted inside and outside classes unless followed by a decimal digit; digit-followed NUL escapes are rejected in both positions | runtime + E4172 |
 | RX-031G | P1 | braced Unicode escapes allow arbitrary leading zeros while rejecting numeric values above U+10FFFF | runtime + E4172 |
 | RX-032 | P1 | unsupported lookaround/backreference/boundary constructs | E4172 |
 | RX-032A | P1 | positive and negative lookahead, positive and negative lookbehind, numeric and named backreferences, and both boundary assertions are rejected individually | E4172 |

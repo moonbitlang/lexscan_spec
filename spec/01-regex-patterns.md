@@ -221,14 +221,18 @@ Supported character escapes include:
 
 - `\f`, `\n`, `\r`, `\t`, and `\v`;
 - `\cA` through `\cZ` and their lowercase forms for control characters;
-- `\0` when used as a character-class escape and not followed by a decimal
-  digit; outside a character class, `\0` is parsed as an unsupported numeric
-  backreference;
-- `\xHH` with exactly two hexadecimal digits;
+- `\0` for NUL, inside or outside a character class, when not followed by a
+  decimal digit; `\00` and `\01` are invalid and are not octal escapes;
+- `\xHH` with exactly two hexadecimal digits, denoting U+00HH in string mode;
 - `\uHHHH` with exactly four hexadecimal digits;
 - `\u{H...}` with one or more hexadecimal digits and a numeric value no
   greater than U+10FFFF; any number of leading zeros is allowed; and
 - escapes for regex punctuation such as `^ $ \\ . * + ? ( ) [ ] } | / "`.
+
+These character escapes have the same meanings inside and outside a class.
+For example, `[\v\0\cA]` contains vertical tab, NUL, and U+0001, not a
+backslash or the letters `v`, `c`, and `A`. An unknown escape MUST be rejected
+inside a class as well as outside it: `[\q]` and `[\p{L}]` are invalid.
 
 An escape of an otherwise ordinary character is invalid. A literal `{` MUST be
 written `[{]`; `\{` begins MoonBit regex interpolation rather than denoting a
@@ -281,6 +285,11 @@ The following constructs are rejected by the current regex parser:
 - character-class set expressions; and
 - ranges whose endpoints are character sets rather than individual scalar
   values.
+
+Runtime `@string.Regex` additionally supports `\b` and `\B` assertions but
+rejects the deprecated `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` shorthands
+with a POSIX-class hint. These are explicit differences from compiled literals;
+they do not change the shared character-escape and class rules above.
 
 ### 3.7 Semantic anchoring
 

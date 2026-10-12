@@ -1,2 +1,4 @@
-// RX-031 RX-032
+// RX-031 RX-031F RX-032
 const BAD_NUL = re"[\01]"
+const CLASS_NUL_FOLLOWED_BY_DIGIT = re"[\00]"
+const NUL_DIGIT_OUTSIDE_CLASS = re"\01"
