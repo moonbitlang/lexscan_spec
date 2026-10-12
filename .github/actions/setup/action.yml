@@ -1,0 +1,19 @@
+name: Setup MoonBit
+description: Install the stable MoonBit toolchain and Node.js
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install MoonBit
+      shell: bash
+      run: |
+        curl --fail --silent --show-error --location --retry 3 \
+          https://cli.moonbitlang.com/install/unix.sh \
+          --output "$RUNNER_TEMP/install-moonbit.sh"
+        bash "$RUNNER_TEMP/install-moonbit.sh" latest
+        echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+    - name: Record toolchain versions
+      shell: bash
+      run: moon version --all

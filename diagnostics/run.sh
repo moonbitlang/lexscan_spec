@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+USE_FIXME=0
+if [[ "${1:-}" == "--fixme" && $# -eq 1 ]]; then
+  USE_FIXME=1
+elif [[ $# -ne 0 ]]; then
+  echo "Usage: $0 [--fixme]" >&2
+  exit 2
+fi
+
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 FIXTURES="$ROOT/diagnostics/fixtures"
 MANIFEST="$ROOT/diagnostics/fixtures.tsv"
 FAILED=0
 PASSED=0
+if [[ $USE_FIXME -eq 1 ]]; then
+  node "$ROOT/scripts/ci.mjs" validate
+fi
 
 make_project() {
   local dir=$1
@@ -67,10 +78,10 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
 
   case_ok=1
   if [[ "$mode" == "error" && $status -eq 0 ]]; then
-    echo "FAIL $name: expected compilation failure"
+    echo "DETAIL $name: expected compilation failure"
     case_ok=0
   elif [[ "$mode" != "error" && $status -ne 0 ]]; then
-    echo "FAIL $name: expected successful checking"
+    echo "DETAIL $name: expected successful checking"
     case_ok=0
   fi
 
@@ -78,7 +89,7 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
     IFS=',' read -ra codes <<< "$expected"
     for code in "${codes[@]}"; do
       if ! contains_code "$output" "$code"; then
-        echo "FAIL $name: missing expected diagnostic $code"
+        echo "DETAIL $name: missing expected diagnostic $code"
         case_ok=0
       fi
     done
@@ -88,13 +99,17 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
     IFS=',' read -ra codes <<< "$forbidden"
     for code in "${codes[@]}"; do
       if contains_code "$output" "$code"; then
-        echo "FAIL $name: found forbidden diagnostic $code"
+        echo "DETAIL $name: found forbidden diagnostic $code"
         case_ok=0
       fi
     done
   fi
 
-  if [[ $case_ok -eq 1 ]]; then
+  if [[ $USE_FIXME -eq 1 ]]; then
+    if ! node "$ROOT/scripts/ci.mjs" diagnostic-result "$name" "$case_ok" "$status" "$output"; then
+      FAILED=$((FAILED + 1))
+    fi
+  elif [[ $case_ok -eq 1 ]]; then
     echo "PASS $name"
     PASSED=$((PASSED + 1))
   else
@@ -104,5 +119,9 @@ while IFS=$'\t' read -r name mode expected forbidden imports; do
   rm -rf "$tmp"
 done < "$MANIFEST"
 
-echo "Diagnostic fixtures: $PASSED passed, $FAILED failed"
+if [[ $USE_FIXME -eq 1 ]]; then
+  echo "Diagnostic fixtures (strict FIXME): $FAILED blocking failures"
+else
+  echo "Diagnostic fixtures: $PASSED passed, $FAILED failed"
+fi
 [[ $FAILED -eq 0 ]]

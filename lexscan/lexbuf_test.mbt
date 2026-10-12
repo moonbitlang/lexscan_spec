@@ -90,7 +90,7 @@ test "LS-010A omitted and explicit first strategies are equivalent" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-012 LS-013 LS-014 first and longest case selection" {
-  let first = chunked(["ab"])
+  let first = @lexscan.chunked(["ab"])
   inspect(
     lexscan first {
       re"^a" => "short"
@@ -101,7 +101,7 @@ test "LS-012 LS-013 LS-014 first and longest case selection" {
   )
   inspect(first.__get_cursor(), content="1")
 
-  let longest = chunked(["ab"])
+  let longest = @lexscan.chunked(["ab"])
   inspect(
     lexscan longest with longest {
       re"^a" => "short"
@@ -112,7 +112,7 @@ test "LS-012 LS-013 LS-014 first and longest case selection" {
   )
   inspect(longest.__get_cursor(), content="2")
 
-  let tied = chunked(["ab"])
+  let tied = @lexscan.chunked(["ab"])
   inspect(
     lexscan tied with longest {
       re"^a." => "first"
@@ -125,7 +125,7 @@ test "LS-012 LS-013 LS-014 first and longest case selection" {
 
 ///|
 test "LS-013C ambiguous maximal captures form one coherent path" {
-  let input = chunked(["a", "a"])
+  let input = @lexscan.chunked(["a", "a"])
   lexscan input with longest {
     (((re"^(a|aa)" as left) + (re"a?" as right)) as whole) + re"$" => {
       assert_eq(whole, "aa")
@@ -141,7 +141,7 @@ test "LS-013C ambiguous maximal captures form one coherent path" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-012A first-mode lazy quantifier spellings and backtracking" {
-  let star = chunked(["aaaa"])
+  let star = @lexscan.chunked(["aaaa"])
   let star_capture : StringView = lexscan star {
     re"^a*?" as captured => captured
     _ => "missing"
@@ -149,7 +149,7 @@ test "LS-012A first-mode lazy quantifier spellings and backtracking" {
   assert_eq(star_capture, "")
   assert_eq(star.__get_cursor(), 0)
 
-  let plus = chunked(["aaaa"])
+  let plus = @lexscan.chunked(["aaaa"])
   let plus_capture : StringView = lexscan plus {
     re"^a+?" as captured => captured
     _ => "missing"
@@ -157,7 +157,7 @@ test "LS-012A first-mode lazy quantifier spellings and backtracking" {
   assert_eq(plus_capture, "a")
   assert_eq(plus.__get_cursor(), 1)
 
-  let optional = chunked(["a"])
+  let optional = @lexscan.chunked(["a"])
   let optional_capture : StringView = lexscan optional {
     re"^a??" as captured => captured
     _ => "missing"
@@ -165,28 +165,28 @@ test "LS-012A first-mode lazy quantifier spellings and backtracking" {
   assert_eq(optional_capture, "")
   assert_eq(optional.__get_cursor(), 0)
 
-  let exact = chunked(["aaaa"])
+  let exact = @lexscan.chunked(["aaaa"])
   let exact_capture : StringView = lexscan exact {
     re"^a{2}?" as captured => captured
     _ => "missing"
   }
   assert_eq(exact_capture, "aa")
 
-  let open = chunked(["aaaa"])
+  let open = @lexscan.chunked(["aaaa"])
   let open_capture : StringView = lexscan open {
     re"^a{2,}?" as captured => captured
     _ => "missing"
   }
   assert_eq(open_capture, "aa")
 
-  let closed = chunked(["aaaa"])
+  let closed = @lexscan.chunked(["aaaa"])
   let closed_capture : StringView = lexscan closed {
     re"^a{2,4}?" as captured => captured
     _ => "missing"
   }
   assert_eq(closed_capture, "aa")
 
-  let backtracking = chunked(["aa", "ab"])
+  let backtracking = @lexscan.chunked(["aa", "ab"])
   let prefix : StringView = lexscan backtracking {
     (re"^a*?" as captured) + re"b" => captured
     _ => "missing"
@@ -197,7 +197,7 @@ test "LS-012A first-mode lazy quantifier spellings and backtracking" {
 
 ///|
 test "LS-012B failed partial prefix does not consume" {
-  let input = chunked(["a", "c"])
+  let input = @lexscan.chunked(["a", "c"])
   inspect(
     lexscan input {
       re"^ab" => "ab"
@@ -211,7 +211,7 @@ test "LS-012B failed partial prefix does not consume" {
 
 ///|
 test "LS-012C cross-refill partial failure retries from the scan origin" {
-  let first = chunked(["a", "c"])
+  let first = @lexscan.chunked(["a", "c"])
   let first_token : StringView = lexscan first {
     re"^ab" as token => token
     re"^ac" as token => token
@@ -220,7 +220,7 @@ test "LS-012C cross-refill partial failure retries from the scan origin" {
   assert_eq(first_token, "ac")
   assert_eq(first.__get_cursor(), 2)
 
-  let longest = chunked(["a", "c"])
+  let longest = @lexscan.chunked(["a", "c"])
   let longest_token : StringView = lexscan longest with longest {
     re"^ab" as token => token
     re"^ac" as token => token
@@ -233,7 +233,7 @@ test "LS-012C cross-refill partial failure retries from the scan origin" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-013A longest waits across refills for the maximal token" {
-  let input = chunked(["a", "b", "c", "d", "!"])
+  let input = @lexscan.chunked(["a", "b", "c", "d", "!"])
   inspect(
     lexscan input with longest {
       re"^a" => "short"
@@ -317,7 +317,7 @@ test "LS-019A wildcard-only expression does not refill" {
 ///|
 #warnings("-deprecated")
 test "LS-019C wildcard-only StringScanner behavior" {
-  let scanner = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0, }
   inspect(
     lexscan scanner {
       _ => 7
@@ -330,7 +330,7 @@ test "LS-019C wildcard-only StringScanner behavior" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-021B read-ahead cannot change logical cursor or next token" {
-  let input = chunked(["a", "b"])
+  let input = @lexscan.chunked(["a", "b"])
   inspect(
     lexscan input {
       re"^a" => "a"
@@ -352,14 +352,14 @@ test "LS-021B read-ahead cannot change logical cursor or next token" {
 
 ///|
 test "LS-023 exhaustive character-or-EOF cases omit catch-all" {
-  let nonempty = chunked(["x"])
+  let nonempty = @lexscan.chunked(["x"])
   inspect(
     lexscan nonempty {
       re"^(?:.|$)" => "covered"
     },
     content="covered",
   )
-  let empty = chunked([])
+  let empty = @lexscan.chunked([])
   inspect(
     lexscan empty {
       re"^(?:.|$)" => "covered"
@@ -370,7 +370,7 @@ test "LS-023 exhaustive character-or-EOF cases omit catch-all" {
 
 ///|
 test "LS-039 Lexbuf zero-length success and EOF are distinct" {
-  let nonempty = chunked(["a"])
+  let nonempty = @lexscan.chunked(["a"])
   inspect(
     lexscan nonempty {
       re"^" => "empty"
@@ -399,7 +399,7 @@ test "LS-039 Lexbuf zero-length success and EOF are distinct" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-040 result typing and selected body evaluation" {
-  let input = chunked(["a"])
+  let input = @lexscan.chunked(["a"])
   let mut selected_runs = 0
   let mut unselected_runs = 0
   let result : Int = lexscan input {
@@ -420,7 +420,7 @@ test "LS-040 result typing and selected body evaluation" {
 
 ///|
 test "LS-024 LS-025 LS-026 token and capture span chunks" {
-  let input = chunked(["", "ab", "", "cd", "!"])
+  let input = @lexscan.chunked(["", "ab", "", "cd", "!"])
   let captured : StringView = lexscan input {
     re"^[a-z]+" as word => word
     _ => ""
@@ -438,7 +438,7 @@ test "LS-024 LS-025 LS-026 token and capture span chunks" {
 
 ///|
 test "LS-024A token ending at a chunk boundary commits only its end" {
-  let input = chunked(["ab", "!"])
+  let input = @lexscan.chunked(["ab", "!"])
   let token : StringView = lexscan input {
     re"^ab" as captured => captured
     _ => ""
@@ -456,7 +456,7 @@ test "LS-024A token ending at a chunk boundary commits only its end" {
 
 ///|
 test "LS-025A finite empty-chunk runs preserve the token stream" {
-  let input = chunked(["", "", "a", "", "", "b", "", ""])
+  let input = @lexscan.chunked(["", "", "a", "", "", "b", "", ""])
   inspect(
     lexscan input {
       re"^ab$" => "whole"
@@ -469,7 +469,7 @@ test "LS-025A finite empty-chunk runs preserve the token stream" {
 
 ///|
 test "LS-026A nested captures cross independent chunk boundaries" {
-  let input = chunked(["a", "b", "c", "d", "!"])
+  let input = @lexscan.chunked(["a", "b", "c", "d", "!"])
   lexscan input {
     (re"^a" + (re"bc" as middle) + re"d") as whole => {
       assert_eq(middle, "bc")
@@ -482,7 +482,7 @@ test "LS-026A nested captures cross independent chunk boundaries" {
 
 ///|
 test "LS-027 dollar waits for true EOF rather than a chunk boundary" {
-  let not_eof = chunked(["ab", "!"])
+  let not_eof = @lexscan.chunked(["ab", "!"])
   inspect(
     lexscan not_eof {
       re"^ab$" => "wrong-end"
@@ -492,7 +492,7 @@ test "LS-027 dollar waits for true EOF rather than a chunk boundary" {
   )
   inspect(not_eof.__get_cursor(), content="0")
 
-  let true_eof = chunked(["a", "b"])
+  let true_eof = @lexscan.chunked(["a", "b"])
   inspect(
     lexscan true_eof {
       re"^ab$" => "at-end"
@@ -505,7 +505,7 @@ test "LS-027 dollar waits for true EOF rather than a chunk boundary" {
 
 ///|
 test "LS-027C failed dollar match restores cursor after refill to EOF" {
-  let input = chunked(["a", "b", "!", "", ""])
+  let input = @lexscan.chunked(["a", "b", "!", "", ""])
   inspect(
     lexscan input {
       re"^ab$" => "wrong-end"
@@ -527,7 +527,7 @@ test "LS-027C failed dollar match restores cursor after refill to EOF" {
 ///|
 test "LS-033 LS-034 non-BMP token is one Char and two code units" {
   let source = "😀"
-  let input = chunked([
+  let input = @lexscan.chunked([
     source.unsafe_substring(start=0, end=1),
     source.unsafe_substring(start=1, end=2),
   ])
@@ -542,7 +542,7 @@ test "LS-033 LS-034 non-BMP token is one Char and two code units" {
 ///|
 test "LS-034B Lexbuf joins a split non-BMP scalar across empty chunks" {
   let source = "😀"
-  let input = chunked([
+  let input = @lexscan.chunked([
     source.unsafe_substring(start=0, end=1),
     "",
     "",
@@ -558,7 +558,7 @@ test "LS-034B Lexbuf joins a split non-BMP scalar across empty chunks" {
 
 ///|
 test "LS-035 LS-035B retained captures remain valid after later refills" {
-  let input = chunked(["ab", "cd", " ", "ef", "gh", "!"])
+  let input = @lexscan.chunked(["ab", "cd", " ", "ef", "gh", "!"])
   let first : StringView = lexscan input {
     re"^[a-z]+" as word => word
     _ => ""
@@ -595,7 +595,7 @@ test "LS-024 LS-026 LS-035 retention across one thousand chunks" {
     chunks.push("y")
   }
   chunks.push("!")
-  let input = chunked(chunks)
+  let input = @lexscan.chunked(chunks)
   let first : StringView = lexscan input {
     re"^x+" as word => word
     _ => ""
@@ -628,7 +628,7 @@ test "LS-024 LS-026 LS-035 retention across one thousand chunks" {
 test "LS-035C repeated compaction preserves absolute cursors" {
   let chunks = Array::make(300, "a ")
   chunks.push("!")
-  let input = chunked(chunks)
+  let input = @lexscan.chunked(chunks)
   let mut tokens = 0
   for _ in 0..<300 {
     let word : Char = lexscan input {
@@ -659,7 +659,7 @@ test "LS-035C repeated compaction preserves absolute cursors" {
 
 ///|
 test "RX-037 RX-037A referenced and composed constants work in lexscan" {
-  let input = chunked(["hello", "!"])
+  let input = @lexscan.chunked(["hello", "!"])
   let whole : StringView = lexscan input {
     @patterns.HIDDEN_ANCHORED_NAMED_CAPTURE as whole => whole
     _ => ""
@@ -667,7 +667,7 @@ test "RX-037 RX-037A referenced and composed constants work in lexscan" {
   assert_eq(whole, "hello")
   assert_eq(input.__get_cursor(), 5)
 
-  let composed = chunked(["ab", "!"])
+  let composed = @lexscan.chunked(["ab", "!"])
   let pair : StringView = lexscan composed {
     (re"^" + @patterns.QUALIFIED_A + @patterns.QUALIFIED_B) as pair => pair
     _ => ""
@@ -678,7 +678,7 @@ test "RX-037 RX-037A referenced and composed constants work in lexscan" {
 
 ///|
 test "LS-037 backend-neutral scanning semantics" {
-  let input = chunked(["ab", "12", "😀"])
+  let input = @lexscan.chunked(["ab", "12", "😀"])
   let word : StringView = lexscan input {
     re"^[a-z]+" as captured => captured
     _ => ""
