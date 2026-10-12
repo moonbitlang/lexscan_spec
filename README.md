@@ -8,7 +8,10 @@ This repository specifies the MoonBit language behavior of:
   `@lexbuf.StringScanner`.
 
 The specification targets `moon 0.1.20260814` and `moonc
-v0.10.8+8606a5800`.
+v0.10.8+8606a5800` as its historical baseline. The shared regex parser contract
+also incorporates [core PR #4373](https://github.com/moonbitlang/core/pull/4373)
+and requires its corresponding compiler update. The baseline release does not
+pass those new conformance cases.
 
 The [published MoonBit v0.10.7 documentation](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan)
 is linked for comparison. Version differences and publicly reproducible
@@ -33,8 +36,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 240 independently testable requirements. The
-ordinary runtime/type layer contains 129 tests; diagnostic fixtures and format
+The current matrix contains 246 independently testable requirements. The
+ordinary runtime/type layer contains 145 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:

@@ -1,0 +1,2 @@
+// RX-048
+const UNESCAPED_BRACKET = re"[!-[]"

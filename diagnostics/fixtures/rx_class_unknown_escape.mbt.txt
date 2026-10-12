@@ -1,0 +1,3 @@
+// RX-031
+const UNKNOWN_ESCAPE = re"[\q]"
+const UNKNOWN_PROPERTY = re"[\p{L}]"

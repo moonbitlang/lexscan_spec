@@ -24,17 +24,26 @@ invalid. Conditions include:
 - a malformed or unsupported escape;
 - a quantifier without an atom;
 - a quantifier applied to `^` or `$`;
-- a Unicode escape in the surrogate range, including adjacent high/low
-  surrogate escapes;
+- a Unicode escape whose numeric value exceeds U+10FFFF;
 - a repetition minimum greater than its maximum;
 - a descending character range;
 - a range over character sets;
 - an unsupported POSIX class;
 - lookaround, backreferences, or word-boundary assertions;
 - character-class set intersection or subtraction;
+- a hyphen that does not separate individual range endpoints, or a reserved
+  unescaped `[` at a range endpoint;
 - a malformed group modifier;
 - duplicate named captures in a first-class regex literal; and
 - a non-greedy quantifier under the `longest` strategy.
+
+Unpaired surrogate escapes and adjacent fixed high/low surrogate escapes are
+valid under the shared escape rules and MUST NOT be rejected merely for naming
+surrogate code points. A parser resource limit, including excessive group
+nesting, MUST also be reported normally. Runtime `@string.Regex` rejects
+invalid patterns by raising its parser error; compiler diagnostic codes such
+as E4172 do not apply to runtime construction. An unterminated range such as
+`[a-` MUST raise that error rather than abort the program.
 
 ### E4181 — Named capture in a direct lexical regex literal
 

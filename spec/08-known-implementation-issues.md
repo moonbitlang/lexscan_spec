@@ -24,20 +24,18 @@ is not an instance of this issue.
 Acceptance of `^+` is an implementation defect. It must not be used as a
 portable way to establish semantic anchoring.
 
-### KI-002: An isolated-surrogate regex escape may not fail normally
+### KI-002: Valid surrogate escapes can trigger an internal compiler error
 
-An isolated surrogate is not a Unicode scalar value and cannot be expressed by
-the regex language. Such a regex must be rejected as invalid.
-
-The compiler regex parser may accept surrogate escapes rather than issuing a
-normal invalid-regex diagnostic. This includes adjacent high/low escape pairs,
-which are also invalid under the specification. On the tested toolchain,
+Surrogate escapes are valid under the shared escape contract. An unpaired
+escape matches no scalar; adjacent fixed high/low escapes match one non-BMP
+scalar. On the baseline toolchain,
 `input =~ re"\uD800"` and `input =~ re"^\uD83D\uDE00$"` can instead trigger
 an internal UTF-8 decoding error in the literal matching optimization.
 
-The core runtime regex parser rejects these surrogate escapes, consistent with
-the specification. The compiler must also reject them normally with E4172;
-acceptance or an internal compiler error remains an implementation defect.
+The baseline runtime parser rejects these escapes. Core PR #4373 updates the
+runtime parser to the shared contract. The compiler must also handle them
+without an internal decoding error; rejecting a valid surrogate escape is no
+longer the required remedy.
 
 ### KI-003: An empty braced Unicode escape is accepted
 
@@ -55,3 +53,28 @@ The baseline toolchain rejects a written repetition bound greater than 256.
 This is a compilation limit, not a language-level regex limit. Other conforming
 implementations are not required to use the same number, and the conformance
 suite must not use 256 versus 257 as a semantic boundary.
+
+### IL-002: Group nesting is limited to 128
+
+The parser referenced by core PR #4373 limits simultaneously open groups to
+128. All group forms count, while sequential groups do not accumulate depth.
+The 129th open group produces a normal parser error. Other implementations MAY
+choose a different resource limit; stack overflow or a process abort is not an
+acceptable way to report excessive nesting.
+
+The RX-051 boundary probes check this referenced parser's resource limit;
+128 versus 129 is not a portable matching-semantic distinction.
+
+## 4. Shared parser alignment
+
+[Core PR #4373](https://github.com/moonbitlang/core/pull/4373) corrects runtime
+parsing of control/NUL/hex escapes, Unicode surrogate escapes, leading zeros in
+braced escapes, invalid class escapes and ranges, reserved class punctuation,
+duplicate capture names, unterminated ranges, and excessive group nesting.
+The associated conformance cases require that change and the corresponding
+compiler update. Failures on the baseline toolchain remain visible; the suite
+does not reinterpret old parser behavior as the contract.
+
+Case folding of a negated class remains a separate known issue described in
+that PR: both implementations can match `a` and `A` with `(?i:[^a])` because
+folding occurs after negation. That behavior is not resolved by parser alignment.

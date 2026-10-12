@@ -19,7 +19,7 @@ rx_bad_braced_unicode_escape	error	E4172	-	-
 rx_bad_ordinary_escape	error	E4172	-	-
 rx_escape_variants	error	E4172	-	-
 rx_bad_capture_names	error	E4172	-	-
-rx_nul_and_class_surrogate	error	E4172	-	-
+rx_nul_and_class_surrogate	runtime	-	E4172	-
 rx_unicode_above_max	error	E4172	-	-
 rx_bad_control_escape	error	E4172	-	-
 rx_nul_followed_by_digit	error	E4172	-	-
@@ -43,8 +43,8 @@ rx_quantified_end_anchor	error	E4172	-	-
 rx_quantified_end_plus	error	E4172	-	-
 rx_quantified_end_star	error	E4172	-	-
 rx_quantified_end_bounded	error	E4172	-	-
-rx_isolated_surrogate	error	E4172	-	-
-rx_surrogate_pair_escape	error	E4172	-	-
+rx_isolated_surrogate	runtime	-	E4172	-
+rx_surrogate_pair_escape	runtime	-	E4172	-
 rx_interpolation_not_escape	error	-	-	-
 rx_interpolation_attempt	error	-	-	-
 rx_leading_hyphen	error	E4172	-	-
@@ -108,3 +108,12 @@ ls_unreachable_bodies	error	E4021,E0090	-	lexbuf
 ls_case_errors	error	E4014	-	lexbuf
 ls_exhaustiveness_edges	error	E4224	-	lexbuf
 ls_indirect_lexbuf	error	E4037	-	special
+rx_class_unknown_escape	error	E4172	-	-
+rx_stray_hyphen	error	E4172	-	-
+rx_posix_stray_hyphen	error	E4172	-	-
+rx_class_range_intersection	error	E4172	-	-
+rx_class_unescaped_range_end	error	E4172	-	-
+rx_duplicate_named_alternative	error	E4172	-	-
+rx_duplicate_named_nested	error	E4172	-	-
+rx_unterminated_range	error	E4172	-	-
+rx_group_nesting	error	E4172	-	-

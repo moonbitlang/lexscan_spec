@@ -17,7 +17,7 @@ target-input domain to well-formed UTF-16.
 
 | ID | Status | Decision area |
 | --- | --- | --- |
-| RQ-001 | Resolved | Regex Unicode escapes denote scalars, not surrogate code units |
+| RQ-001 | Resolved | Unicode escapes name code points; matching remains over scalars |
 | RQ-002 | Resolved | Direct anchors cannot be quantified |
 | RQ-003 | Resolved | Non-final `lexmatch` binder catch-all uses E4171 |
 | RQ-004 | Resolved | Source case order precedes per-case leftmost matching |
@@ -36,10 +36,12 @@ target-input domain to well-formed UTF-16.
 
 ## RQ-001: Unicode scalar escapes and UTF-16 surrogates
 
-Resolved: each regex Unicode escape must denote a Unicode scalar value. Fixed
-and braced surrogate escapes are invalid, including adjacent high/low escape
-pairs; the parser does not combine them. Non-BMP scalars use literal characters
-or braced scalar escapes such as `\u{1f600}`. Valid surrogate pairs in input
+Resolved in alignment with [core PR #4373](https://github.com/moonbitlang/core/pull/4373):
+Unicode escapes name code points up to U+10FFFF. Adjacent fixed-width high/low
+surrogate escapes combine into one scalar. Unpaired fixed or braced surrogate
+escapes are accepted but match no scalar; they may delimit ranges, whose
+members are intersected with the scalar-value domain. This replaces the prior
+decision to reject all surrogate escapes. Valid surrogate pairs in input
 strings continue to denote one non-BMP scalar.
 
 The target-input boundary for ill-formed strings is resolved separately by

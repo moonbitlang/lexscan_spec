@@ -63,14 +63,15 @@ Priority labels:
 | RX-028 | P1 | unsupported POSIX class rejected | E4172 |
 | RX-028A | P1 | an unclosed POSIX character class is rejected | E4172 |
 | RX-029 | P1 | `\d`/`\s`/`\w` families accepted with E0027 | warning + runtime |
-| RX-030 | P0 | control, character-class NUL, hex, fixed Unicode, and braced Unicode escapes | runtime |
+| RX-030 | P0 | control, NUL inside and outside classes, hex, fixed Unicode, and braced Unicode escapes | runtime |
 | RX-031 | P1 | malformed escape variants rejected with precise primary error | E4172 |
 | RX-031A | P1 | incomplete, non-hex, unclosed, empty, overflow, and invalid-control escape variants are rejected | E4172 |
-| RX-031B | P1 | fixed and braced surrogate escapes are rejected, including adjacent high/low escape pairs; literal non-BMP scalars and braced scalar escapes remain valid | E4172 + runtime |
-| RX-031C | P1 | scalar boundary values U+D7FF, U+E000, and U+10FFFF are expressible, while both fixed and braced isolated-surrogate forms are rejected | runtime + E4172 |
+| RX-031B | P1 | adjacent fixed-width high/low surrogate escapes combine into one non-BMP scalar, including in classes and range endpoints | runtime |
+| RX-031C | P1 | Unicode scalar boundaries remain expressible; unpaired fixed/braced surrogate escapes match no scalar or empty string, and surrogate range endpoints are intersected with the scalar domain | runtime |
 | RX-031D | P1 | regex interpolation is not a pattern feature; an attempted interpolation is rejected rather than evaluated | parse/typing negative |
 | RX-031E | P1 | empty, digit-leading, punctuation-containing, and unclosed named-capture identifiers are rejected | E4172 |
-| RX-031F | P1 | `\0` outside a class is an unsupported numeric backreference, while an isolated-surrogate escape is invalid inside a class as well as outside it | E4172 |
+| RX-031F | P1 | NUL is accepted inside and outside classes unless followed by a decimal digit; digit-followed NUL escapes are rejected in both positions | runtime + E4172 |
+| RX-031G | P1 | braced Unicode escapes allow arbitrary leading zeros while rejecting numeric values above U+10FFFF | runtime + E4172 |
 | RX-032 | P1 | unsupported lookaround/backreference/boundary constructs | E4172 |
 | RX-032A | P1 | positive and negative lookahead, positive and negative lookbehind, numeric and named backreferences, and both boundary assertions are rejected individually | E4172 |
 | RX-032B | P1 | both character-class intersection and subtraction spellings are rejected as unsupported class-set expressions | E4172 |
@@ -97,6 +98,11 @@ Priority labels:
 | RX-045 | P1 | empty language `[]` never matches | runtime + warning interaction |
 | RX-046 | P1 | direct `^` and `$` assertions cannot be quantified, while grouped zero-width forms such as `(^){2}` remain valid | E4172 + runtime |
 | RX-047 | P1 | `[{]` and `[}]` match literal braces; class hyphen uses `\-`; incompatible left-brace and hyphen forms are rejected | runtime + E4172/parse negative |
+| RX-048 | P1 | stray class hyphens, class-set range endpoints, reserved `&&` even at range endpoints, and unescaped nested `[` are rejected; escaped punctuation stays literal | E4172 + runtime parser error |
+| RX-049 | P1 | capture names are unique across sequential, alternative, and nested groups | E4172 + runtime parser error |
+| RX-050 | P1 | an unterminated range is rejected normally, without a process abort | E4172 + runtime parser error |
+| RX-051 | P1 | parser nesting-limit errors are normal; the referenced parser accepts 128 open groups of all kinds, rejects 129, and does not accumulate depth for sequential groups (IL-002) | E4172 + runtime parser error |
+| RX-052 | P1 | first-class literal serialization preserves character sets whose generated ranges have surrogate endpoints | runtime |
 
 ## 3. Regex match expression (`=~`)
 

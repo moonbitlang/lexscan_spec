@@ -208,12 +208,22 @@ The shorthand escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are currently
 accepted but emit warning E0027 (`deprecated_syntax`). Their replacements are
 the corresponding POSIX classes and negated POSIX classes.
 
-Within a character class, `-` starts a range. A literal hyphen MUST be written
-`\-`. Placing an unescaped hyphen at the beginning or end of a class is invalid.
+Within a character class, an unescaped `-` MUST separate two individual
+code-point endpoints of a range. A literal hyphen MUST be written `\-`.
+An unescaped hyphen anywhere else is invalid, including `[-a]`, `[a-]`,
+`[a-b-c]`, `[[:digit:]-a]`, and `[[:digit:]-]`. A POSIX class cannot be either
+endpoint of a range.
 Other supported regex-punctuation escapes remain literal class atoms. For
 example, `[\[]`, `[\]]`, and `[\\]` match a left bracket, right bracket, and
 backslash respectively. A colon is ordinary unless it participates in the
 complete `[:name:]` syntax of a POSIX class.
+
+Unescaped `&&` and `--` are reserved for unsupported class-set operations and
+MUST be rejected everywhere inside a class, including at a range endpoint:
+`[!-&&]` is invalid. A single `&` is ordinary, and `\&` is a literal ampersand.
+An unescaped `[` is reserved for nested classes except when it opens a POSIX
+class; `[!-[]` is invalid, while `[!-\[]` is a valid range. `\:` is also a
+literal colon inside a class.
 
 ### 3.5 Escapes
 
@@ -221,13 +231,18 @@ Supported character escapes include:
 
 - `\f`, `\n`, `\r`, `\t`, and `\v`;
 - `\cA` through `\cZ` and their lowercase forms for control characters;
-- `\0` when used as a character-class escape and not followed by a decimal
-  digit; outside a character class, `\0` is parsed as an unsupported numeric
-  backreference;
-- `\xHH` with exactly two hexadecimal digits;
+- `\0` for NUL, inside or outside a character class, when not followed by a
+  decimal digit; `\00` and `\01` are invalid and are not octal escapes;
+- `\xHH` with exactly two hexadecimal digits, denoting U+00HH in string mode;
 - `\uHHHH` with exactly four hexadecimal digits;
-- `\u{H...}` for a scalar value no greater than U+10FFFF; and
+- `\u{H...}` with one or more hexadecimal digits and a numeric value no
+  greater than U+10FFFF; any number of leading zeros is allowed; and
 - escapes for regex punctuation such as `^ $ \\ . * + ? ( ) [ ] } | / "`.
+
+These character escapes have the same meanings inside and outside a class.
+For example, `[\v\0\cA]` contains vertical tab, NUL, and U+0001, not a
+backslash or the letters `v`, `c`, and `A`. An unknown escape MUST be rejected
+inside a class as well as outside it: `[\q]` and `[\p{L}]` are invalid.
 
 An escape of an otherwise ordinary character is invalid. A literal `{` MUST be
 written `[{]`; `\{` begins MoonBit regex interpolation rather than denoting a
@@ -243,13 +258,46 @@ construct a regex dynamically.
 Inside a character class, `\b` denotes backspace and `\-` denotes a literal
 hyphen.
 
-Each Unicode escape sequence MUST denote a Unicode scalar value. Both fixed
-and braced escapes in the surrogate range U+D800 through U+DFFF are invalid,
-inside and outside character classes. Adjacent high-surrogate/low-surrogate
-escapes are not combined: `\uD83D\uDE00` is invalid. Use a literal non-BMP
-character or a braced scalar escape such as `\u{1f600}` instead.
+Adjacent fixed-width escapes for a high surrogate U+D800 through U+DBFF and a
+low surrogate U+DC00 through U+DFFF MUST combine into one code point, inside
+or outside a class, including at a range endpoint. Thus `\uD83D\uDE00`
+matches `😀`, and `[\uD83D\uDE00-\uD83D\uDE4F]` is the range U+1F600
+through U+1F64F. Braced escapes do not participate in this combination.
 
-### 3.6 Unsupported constructs
+An unpaired surrogate escape, fixed or braced, is valid but matches no scalar
+value. It does not match the empty string. A surrogate code point may be a
+range endpoint; the resulting set MUST exclude U+D800 through U+DFFF. For
+example, `[\u0000-\uDFFF]` contains U+0000 through U+D7FF,
+`[\uD800-\uFFFF]` contains U+E000 through U+FFFF, `[a\uD83D]` contains only
+`a`, and `[^\uD800]` contains every scalar. A range with descending code-point
+endpoints remains invalid even if both endpoints are surrogates.
+
+The shared rules apply to runtime construction with `@string.Regex` and to a
+first-class literal such as `let r : Regex = re"[^\uD7FF]"`. Construction of a
+valid literal MUST preserve its character set when the compiler serializes it
+for the runtime parser; it MUST NOT fail because the serialized range has a
+surrogate endpoint.
+
+Runtime construction takes an ordinary `StringView`, after MoonBit string
+escaping has been decoded. For example, the source string `"\\x41"` passes
+the regex escape `\x41` to the runtime parser. The surface-lexer restriction
+on `\{` applies to `re"..."`; a runtime pattern can escape a literal brace.
+
+### 3.6 Group validation and parser limits
+
+Named capture identifiers use `[A-Za-z_][A-Za-z0-9_]*`. Names MUST be unique
+throughout one regex, including across alternative branches and nested groups.
+Both `(?<x>a)(?<x>b)` and `(?<x>a)|(?<x>b)` are invalid. This is separate from
+the restriction on named groups in direct lexical patterns in Section 4.3.
+
+An implementation MAY impose a nesting resource limit. The parser version
+referenced in Section 1 of the scope document accepts 128 simultaneously open
+groups and rejects a 129th. Capturing, non-capturing, and modifier groups all
+count; sequential groups do not add to nesting depth. Excessive nesting MUST
+produce a normal invalid-pattern error rather than a stack overflow. The exact
+limit is documented as IL-002 and is not a matching-semantic boundary.
+
+### 3.7 Unsupported constructs
 
 The following constructs are rejected by the current regex parser:
 
@@ -259,10 +307,15 @@ The following constructs are rejected by the current regex parser:
 - positive or negative lookahead;
 - positive or negative lookbehind;
 - character-class set expressions; and
-- ranges whose endpoints are character sets rather than individual scalar
+- ranges whose endpoints are character sets rather than individual code-point
   values.
 
-### 3.7 Semantic anchoring
+Runtime `@string.Regex` additionally supports `\b` and `\B` assertions but
+rejects the deprecated `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` shorthands
+with a POSIX-class hint. These are explicit differences from compiled literals;
+they do not change the shared character-escape and class rules above.
+
+### 3.8 Semantic anchoring
 
 Start and end anchoring are properties of the complete compiled regex, not
 textual checks for the first or last character of a literal.
