@@ -15,14 +15,23 @@ classified here as defects.
 
 ### KI-001: A direct quantified start anchor is accepted
 
-The baseline toolchain accepts direct quantified `^` forms including `^+`,
+**Status:** Resolved in the publicly released compiler
+`moonc v0.10.14+7d59c7ec9 (2026-09-18)`, verified against the existing diagnostic
+fixtures. This is a verified fixed version, not a claim about the first release
+containing the fix. The original `v0.10.8+8606a5800` baseline behavior below is
+retained for historical context.
+
+The original baseline toolchain accepted direct quantified `^` forms including `^+`,
 `^*`, `^?`, and bounded repetition. The language rule is that a direct
 zero-width assertion cannot be quantified; the corresponding `$` forms are
-already rejected. A group containing an anchor, such as `(^){2}`, is valid and
+also invalid. A group containing an anchor, such as `(^){2}`, is valid and
 is not an instance of this issue.
 
-Acceptance of `^+` is an implementation defect. It must not be used as a
-portable way to establish semantic anchoring.
+The verified compiler rejects all four direct quantified `^` forms with E4172,
+consistent with the specification, and still accepts quantified groups containing
+an anchor. The conformance fixtures continue to require these rejections.
+Acceptance of `^+` by older compilers was an implementation defect and must not
+be used as a portable way to establish semantic anchoring.
 
 ### KI-002: An isolated-surrogate regex escape may not fail normally
 
