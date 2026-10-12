@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format, types, and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Install coverage audit dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ripgrep
+      - run: node --test scripts/ci.test.mjs
+      - run: node scripts/ci.mjs validate
+      - run: moon fmt --check
+      - run: node scripts/ci.mjs check
+      - run: bash scripts/check_format_fixture.sh
+      - run: bash scripts/check_coverage_ids.sh
+
+  regex-tests:
+    name: Tests (${{ matrix.regex_backend }}, ${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        regex_backend: [table, block, runtime]
+        target: [wasm, wasm-gc, js, native]
+    env:
+      MOONC_INTERNAL_PARAMS: 'regex_backend=${{ matrix.regex_backend }}|'
+    steps:
+      - uses: actions/checkout@v4
+      - id: setup
+        uses: ./.github/actions/setup
+      - name: Debug tests
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: node scripts/ci.mjs test ${{ matrix.regex_backend }} ${{ matrix.target }} debug
+      - name: Release tests
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: node scripts/ci.mjs test ${{ matrix.regex_backend }} ${{ matrix.target }} release
+
+  diagnostics:
+    name: Diagnostics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Check diagnostic fixtures
+        shell: bash
+        run: |
+          set -o pipefail
+          bash diagnostics/run.sh --fixme | tee diagnostics.log
+      - name: Upload diagnostic results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics
+          path: diagnostics.log
+          if-no-files-found: ignore

@@ -34,7 +34,7 @@ typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
 The current matrix contains 240 independently testable requirements. The
-ordinary runtime/type layer contains 129 tests; diagnostic fixtures and format
+ordinary runtime/type layer contains 130 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
@@ -58,6 +58,34 @@ not runnable unless the toolchain installation includes its LLVM core bundle.
 Individual layers can also be run with `moon test`,
 `bash diagnostics/run.sh`, `bash scripts/check_format_fixture.sh`, and
 `bash scripts/check_coverage_ids.sh`.
+
+GitHub Actions runs explicit `table`, `block`, and `runtime` regex backends on
+`wasm`, `wasm-gc`, `js`, and `native`, in debug and release mode. Each backend
+has a separate build directory. Formatting, warning-free type checks, coverage
+IDs, the formatter fixture, and diagnostic fixtures are also checked.
+
+Temporary expected failures are versioned in [FIXME.json](FIXME.json). Every
+listed test is still compiled and run in each applicable backend, target, and
+mode. A matching failure is `XFAIL` and does not block CI. A successful test is
+`XPASS` and **fails CI**, prompting removal or narrowing of its FIXME entry.
+Unlisted failures and failures with a different signature remain blocking.
+Unknown or renamed test identities and malformed list entries also fail CI.
+
+The CI runner isolates each listed test in a temporary project, preserving
+helper declarations, so a compiler error in one FIXME cannot prevent ordinary
+tests from executing. Type checks cover the ordinary project; all isolated
+FIXME cases are checked by the debug/release test jobs. The tracked sources and
+test expectations are unchanged by the runner. Local strict commands above
+continue to run the entire suite without expected-failure allowances.
+
+To reproduce the CI policy locally:
+
+```sh
+node scripts/ci.mjs check
+node scripts/ci.mjs test table js debug
+node scripts/ci.mjs test runtime wasm-gc release
+bash diagnostics/run.sh --fixme
+```
 
 The diagnostic runner is intentionally strict. A baseline compiler that still
 has a divergence listed in

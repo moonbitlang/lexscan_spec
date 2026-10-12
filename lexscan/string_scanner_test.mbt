@@ -1,6 +1,6 @@
 ///|
 test "LS-003 LS-016 StringScanner updates its relative cursor" {
-  let scanner = @lexbuf.StringScanner::{ data: "abc123"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "abc123"[:], cursor: 0, }
   inspect(
     lexscan scanner {
       re"^[a-z]+" => "word"
@@ -13,7 +13,7 @@ test "LS-003 LS-016 StringScanner updates its relative cursor" {
 
 ///|
 test "LS-016A StringScanner body mutation follows automatic commit" {
-  let scanner = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0, }
   lexscan scanner {
     re"^a" => scanner.cursor = 0
     _ => fail("initial token did not match")
@@ -29,7 +29,7 @@ test "LS-016A StringScanner body mutation follows automatic commit" {
 ///|
 test "LS-008C StringScanner target expression is evaluated exactly once" {
   let mut evaluations = 0
-  let scanner = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0, }
   fn target() -> @lexbuf.StringScanner {
     evaluations += 1
     scanner
@@ -47,8 +47,8 @@ test "LS-008C StringScanner target expression is evaluated exactly once" {
 
 ///|
 test "LS-008B StringScanner target remains stable across reassignment" {
-  let first = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0 }
-  let second = @lexbuf.StringScanner::{ data: "b"[:], cursor: 0 }
+  let first = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0, }
+  let second = @lexbuf.StringScanner::{ data: "b"[:], cursor: 0, }
   let mut current = first
   lexscan current {
     re"^a" => current = second
@@ -65,7 +65,7 @@ test "LS-008B StringScanner target remains stable across reassignment" {
 
 ///|
 test "LS-018 LS-021A StringScanner catch-all leaves cursor unchanged" {
-  let scanner = @lexbuf.StringScanner::{ data: "?"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "?"[:], cursor: 0, }
   inspect(
     lexscan scanner {
       re"^[a-z]" => 1
@@ -75,7 +75,7 @@ test "LS-018 LS-021A StringScanner catch-all leaves cursor unchanged" {
   )
   inspect(scanner.cursor, content="0")
 
-  let eof = @lexbuf.StringScanner::{ data: ""[:], cursor: 0 }
+  let eof = @lexbuf.StringScanner::{ data: ""[:], cursor: 0, }
   for _ in 0..<2 {
     inspect(
       lexscan eof {
@@ -91,7 +91,7 @@ test "LS-018 LS-021A StringScanner catch-all leaves cursor unchanged" {
 ///|
 test "LS-029 LS-029B sliced StringView bounds and Unicode cursor offsets" {
   let backing = "--abc++"
-  let scanner = @lexbuf.StringScanner::{ data: backing[2:5], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: backing[2:5], cursor: 0, }
   inspect(
     lexscan scanner {
       re"^abc$" => "slice"
@@ -101,7 +101,7 @@ test "LS-029 LS-029B sliced StringView bounds and Unicode cursor offsets" {
   )
   inspect(scanner.cursor, content="3")
 
-  let resumed = @lexbuf.StringScanner::{ data: backing[2:5], cursor: 1 }
+  let resumed = @lexbuf.StringScanner::{ data: backing[2:5], cursor: 1, }
   inspect(
     lexscan resumed {
       re"^bc$" => "relative"
@@ -112,7 +112,10 @@ test "LS-029 LS-029B sliced StringView bounds and Unicode cursor offsets" {
   inspect(resumed.cursor, content="3")
 
   let unicode_backing = "--😀x++"
-  let unicode = @lexbuf.StringScanner::{ data: unicode_backing[2:5], cursor: 2 }
+  let unicode = @lexbuf.StringScanner::{
+    data: unicode_backing[2:5],
+    cursor: 2,
+  }
   let tail : Char = lexscan unicode {
     re"^.$" as ch => ch
     _ => '?'
@@ -123,7 +126,7 @@ test "LS-029 LS-029B sliced StringView bounds and Unicode cursor offsets" {
 
 ///|
 test "LS-029A cursor zero and data length are valid boundaries" {
-  let at_start = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0 }
+  let at_start = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0, }
   inspect(
     lexscan at_start {
       re"^a" => 1
@@ -133,7 +136,7 @@ test "LS-029A cursor zero and data length are valid boundaries" {
   )
   inspect(at_start.cursor, content="1")
 
-  let at_end = @lexbuf.StringScanner::{ data: "a"[:], cursor: 1 }
+  let at_end = @lexbuf.StringScanner::{ data: "a"[:], cursor: 1, }
   inspect(
     lexscan at_end {
       re"^$" => "eof"
@@ -146,7 +149,7 @@ test "LS-029A cursor zero and data length are valid boundaries" {
 
 ///|
 test "LS-030 successive scans resume at the stored cursor" {
-  let scanner = @lexbuf.StringScanner::{ data: "abc123"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "abc123"[:], cursor: 0, }
   inspect(
     lexscan scanner {
       re"^[a-z]+" => "word"
@@ -166,7 +169,7 @@ test "LS-030 successive scans resume at the stored cursor" {
 
 ///|
 test "LS-031 LS-032A empty match neither warns nor advances" {
-  let scanner = @lexbuf.StringScanner::{ data: "abc"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "abc"[:], cursor: 0, }
   inspect(
     lexscan scanner {
       re"^" => "empty"
@@ -211,19 +214,19 @@ fn recursive_count(scanner : @lexbuf.StringScanner, count : Int) -> Int {
 
 ///|
 test "LS-032B LS-038 exhaustive EOF case and recursive scanning" {
-  let scanner = @lexbuf.StringScanner::{ data: "a😀b"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "a😀b"[:], cursor: 0, }
   assert_eq(count_until_eof(scanner), 3)
   assert_eq(scanner.cursor, 4)
 
   let long_input = "x".repeat(2048)
-  let recursive = @lexbuf.StringScanner::{ data: long_input[:], cursor: 0 }
+  let recursive = @lexbuf.StringScanner::{ data: long_input[:], cursor: 0, }
   assert_eq(recursive_count(recursive, 0), 2048)
   assert_eq(recursive.cursor, 2048)
 }
 
 ///|
 test "LS-033 LS-034 StringScanner non-BMP cursor and Char capture" {
-  let scanner = @lexbuf.StringScanner::{ data: "😀!"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "😀!"[:], cursor: 0, }
   let face : Char = lexscan scanner {
     re"^." as ch => ch
     _ => 'x'
@@ -246,7 +249,7 @@ fn scan_string_scanner_after_commit(scanner : @lexbuf.StringScanner) -> String {
 
 ///|
 test "LS-015A StringScanner commits before body evaluation" {
-  let scanner = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0, }
   assert_eq(scan_string_scanner_after_commit(scanner), "ab")
   assert_eq(scanner.cursor, 2)
 }
@@ -254,7 +257,7 @@ test "LS-015A StringScanner commits before body evaluation" {
 ///|
 #warnings("-unused_lexcase")
 test "LS-013B StringScanner longest selection" {
-  let scanner = @lexbuf.StringScanner::{ data: "abcd!"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "abcd!"[:], cursor: 0, }
   inspect(
     lexscan scanner with longest {
       re"^a" => "short"
@@ -268,7 +271,7 @@ test "LS-013B StringScanner longest selection" {
 
 ///|
 test "LS-013C StringScanner ambiguous maximal captures are coherent" {
-  let scanner = @lexbuf.StringScanner::{ data: "aa"[:], cursor: 0 }
+  let scanner = @lexbuf.StringScanner::{ data: "aa"[:], cursor: 0, }
   lexscan scanner with longest {
     (((re"^(a|aa)" as left) + (re"a?" as right)) as whole) + re"$" => {
       assert_eq(whole, "aa")
@@ -287,7 +290,7 @@ test "LS-035D temporary StringScanner target preserves returned captures" {
     "abc!"
   }
   let captured : StringView = lexscan
-    @lexbuf.StringScanner::{ data: make_target()[:], cursor: 0 } {
+    @lexbuf.StringScanner::{ data: make_target()[:], cursor: 0, } {
     re"^[a-z]+" as word => word
     _ => ""
   }
