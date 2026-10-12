@@ -1,16 +1,7 @@
-// RX-031B
-fn invalid_high(input : String) -> Bool {
-  input =~ re"\u{d800}"
-}
-
-fn invalid_low(input : String) -> Bool {
-  input =~ re"\u{dfff}"
-}
-
-fn invalid_fixed_high(input : String) -> Bool {
-  input =~ re"\uD800"
-}
-
-fn invalid_fixed_low(input : String) -> Bool {
-  input =~ re"\uDFFF"
+// RX-031C
+test {
+  assert_true(!("a" =~ re"\uD800"))
+  assert_true(!("" =~ re"\uDFFF"))
+  assert_true(!("😀" =~ re"\u{D800}"))
+  assert_true(!("😀" =~ re"\u{DFFF}"))
 }

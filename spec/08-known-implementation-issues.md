@@ -33,20 +33,18 @@ an anchor. The conformance fixtures continue to require these rejections.
 Acceptance of `^+` by older compilers was an implementation defect and must not
 be used as a portable way to establish semantic anchoring.
 
-### KI-002: An isolated-surrogate regex escape may not fail normally
+### KI-002: Valid surrogate escapes can trigger an internal compiler error
 
-An isolated surrogate is not a Unicode scalar value and cannot be expressed by
-the regex language. Such a regex must be rejected as invalid.
-
-The compiler regex parser may accept surrogate escapes rather than issuing a
-normal invalid-regex diagnostic. This includes adjacent high/low escape pairs,
-which are also invalid under the specification. On the tested toolchain,
+Surrogate escapes are valid under the shared escape contract. An unpaired
+escape matches no scalar; adjacent fixed high/low escapes match one non-BMP
+scalar. On the baseline toolchain,
 `input =~ re"\uD800"` and `input =~ re"^\uD83D\uDE00$"` can instead trigger
 an internal UTF-8 decoding error in the literal matching optimization.
 
-The core runtime regex parser rejects these surrogate escapes, consistent with
-the specification. The compiler must also reject them normally with E4172;
-acceptance or an internal compiler error remains an implementation defect.
+The baseline runtime parser rejects these escapes. Core PR #4373 updates the
+runtime parser to the shared contract. The compiler must also handle them
+without an internal decoding error; rejecting a valid surrogate escape is no
+longer the required remedy.
 
 ### KI-003: An empty braced Unicode escape is accepted
 
