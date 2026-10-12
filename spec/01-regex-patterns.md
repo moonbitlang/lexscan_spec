@@ -208,12 +208,22 @@ The shorthand escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are currently
 accepted but emit warning E0027 (`deprecated_syntax`). Their replacements are
 the corresponding POSIX classes and negated POSIX classes.
 
-Within a character class, `-` starts a range. A literal hyphen MUST be written
-`\-`. Placing an unescaped hyphen at the beginning or end of a class is invalid.
+Within a character class, an unescaped `-` MUST separate two individual
+code-point endpoints of a range. A literal hyphen MUST be written `\-`.
+An unescaped hyphen anywhere else is invalid, including `[-a]`, `[a-]`,
+`[a-b-c]`, `[[:digit:]-a]`, and `[[:digit:]-]`. A POSIX class cannot be either
+endpoint of a range.
 Other supported regex-punctuation escapes remain literal class atoms. For
 example, `[\[]`, `[\]]`, and `[\\]` match a left bracket, right bracket, and
 backslash respectively. A colon is ordinary unless it participates in the
 complete `[:name:]` syntax of a POSIX class.
+
+Unescaped `&&` and `--` are reserved for unsupported class-set operations and
+MUST be rejected everywhere inside a class, including at a range endpoint:
+`[!-&&]` is invalid. A single `&` is ordinary, and `\&` is a literal ampersand.
+An unescaped `[` is reserved for nested classes except when it opens a POSIX
+class; `[!-[]` is invalid, while `[!-\[]` is a valid range. `\:` is also a
+literal colon inside a class.
 
 ### 3.5 Escapes
 
@@ -283,7 +293,7 @@ The following constructs are rejected by the current regex parser:
 - positive or negative lookahead;
 - positive or negative lookbehind;
 - character-class set expressions; and
-- ranges whose endpoints are character sets rather than individual scalar
+- ranges whose endpoints are character sets rather than individual code-point
   values.
 
 Runtime `@string.Regex` additionally supports `\b` and `\B` assertions but

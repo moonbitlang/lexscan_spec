@@ -1,0 +1,2 @@
+// RX-048
+const STRAY_HYPHEN = re"[a-b-c]"

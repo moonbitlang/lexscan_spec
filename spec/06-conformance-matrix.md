@@ -98,6 +98,8 @@ Priority labels:
 | RX-045 | P1 | empty language `[]` never matches | runtime + warning interaction |
 | RX-046 | P1 | direct `^` and `$` assertions cannot be quantified, while grouped zero-width forms such as `(^){2}` remain valid | E4172 + runtime |
 | RX-047 | P1 | `[{]` and `[}]` match literal braces; class hyphen uses `\-`; incompatible left-brace and hyphen forms are rejected | runtime + E4172/parse negative |
+| RX-048 | P1 | stray class hyphens, class-set range endpoints, reserved `&&` even at range endpoints, and unescaped nested `[` are rejected; escaped punctuation stays literal | E4172 + runtime parser error |
+| RX-050 | P1 | an unterminated range is rejected normally, without a process abort | E4172 + runtime parser error |
 | RX-052 | P1 | first-class literal serialization preserves character sets whose generated ranges have surrogate endpoints | runtime |
 
 ## 3. Regex match expression (`=~`)
