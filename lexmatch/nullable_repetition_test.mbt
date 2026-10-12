@@ -237,6 +237,34 @@ test "RX-012D repeated captures retain the first arrival at shared control point
   assert_eq(progress_result.content(), "aa")
   assert_eq(progress_result.after(), "!")
   assert_eq(progress_result.named_group("iteration"), Some("a"))
+
+  let before_suffix : Regex = re"^(a?)*b$"
+  guard before_suffix.execute("aab") is Some(suffix_result) else {
+    fail("nullable repeated capture did not match its consuming suffix")
+  }
+  assert_eq(suffix_result.content(), "aab")
+  assert_eq(suffix_result.after(), "")
+  assert_eq(suffix_result.group(1), Some("a"))
+  guard before_suffix.execute("b") is Some(empty_iteration_result) else {
+    fail("nullable repeated capture did not match an empty initial body")
+  }
+  assert_eq(empty_iteration_result.content(), "b")
+  assert_eq(empty_iteration_result.after(), "")
+  assert_eq(empty_iteration_result.group(1), Some(""))
+
+  let named_before_suffix : Regex = re"^(?<item>a?)*b$"
+  guard named_before_suffix.execute("aab") is Some(named_suffix_result) else {
+    fail("named nullable repeated capture did not match its consuming suffix")
+  }
+  assert_eq(named_suffix_result.content(), "aab")
+  assert_eq(named_suffix_result.group(1), Some("a"))
+  assert_eq(named_suffix_result.named_group("item"), Some("a"))
+  guard named_before_suffix.execute("b") is Some(named_empty_result) else {
+    fail("named nullable repeated capture did not match an empty initial body")
+  }
+  assert_eq(named_empty_result.content(), "b")
+  assert_eq(named_empty_result.group(1), Some(""))
+  assert_eq(named_empty_result.named_group("item"), Some(""))
 }
 
 ///|

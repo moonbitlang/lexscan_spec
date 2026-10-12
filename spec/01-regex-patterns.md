@@ -456,9 +456,22 @@ For example:
 | `^(?:a*?b*?)*a` | `baaa` | `baa` | `a` | none |
 | `^(?<body>(?<item>a*?b*?))*(?<tail>a)` | `baaa` | `baa` | `a` | `body`, `item`, and `tail` are `a` |
 | `^(?<item>a?)*$` | `a` | `a` | empty | `item` is `a` |
+| `^(a?)*b$` | `aab` | `aab` | empty | group 1 is `a` |
+| `^(a?)*b$` | `b` | `b` | empty | group 1 is empty |
 | `^(?:(?<item>a*?b*?)*a){2}` | `baaaa` | `baaa` | `a` | `item` is empty |
 
-In the last example, the final empty capture belongs to a distinct finite copy;
+For `^(a?)*b$` on `aab`, group 1 MUST be `a`, not an empty string. After
+consuming the second `a`, the preferred consuming path has already reached the
+repeat/exit control point with that capture. An empty iteration that returns to
+the same control point at the same input position is discarded; its empty
+capture MUST NOT replace the retained capture. The named form
+`^(?<item>a?)*b$` has the same result for `item`.
+
+This is not a general rule to retain the last non-empty capture. On `b`, the
+first mandatory body of the optional-plus construction matches empty, so group
+1 (or `item`) MUST participate with an empty capture rather than be absent.
+
+In the finite-copy example, the final empty capture belongs to a distinct copy;
 it is not suppressed as another arrival at the first copy's control point.
 The policy is the one used for nullable repetition by Go's `regexp` package,
 but it does not adopt unrelated Go syntax, Unicode, or longest-match behavior.
