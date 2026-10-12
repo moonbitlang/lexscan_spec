@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 240 independently testable requirements. The
-ordinary runtime/type layer contains 130 tests; diagnostic fixtures and format
+The current matrix contains 242 independently testable requirements. The
+ordinary runtime/type layer contains 142 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
@@ -63,6 +63,12 @@ GitHub Actions runs explicit `table`, `block`, and `runtime` regex backends on
 `wasm`, `wasm-gc`, `js`, and `native`, in debug and release mode. Each backend
 has a separate build directory. Formatting, warning-free type checks, coverage
 IDs, the formatter fixture, and diagnostic fixtures are also checked.
+
+The nullable repetition policy is defined in
+[Section 5.1](spec/01-regex-patterns.md#51-nullable-repetition-priority):
+`^(?:a*?b*?)*a` on `baaa` matches `baa` and leaves `a`. This selects Go's
+ordered-automaton priority without adopting the complete Go regex dialect.
+The nullable conformance cases remain required and are not listed in FIXME.
 
 Temporary expected failures are versioned in [FIXME.json](FIXME.json). Every
 listed test is still compiled and run in each applicable backend, target, and
