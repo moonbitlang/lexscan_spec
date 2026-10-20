@@ -1,0 +1,8 @@
+// LM-036
+fn f(x : String) -> Int {
+  lexmatch x {
+    (42) => 1
+    (re"^b", after=_) => 2
+    _ => 3
+  }
+}

@@ -1,0 +1,2 @@
+// RX-049C
+const AND = re"[a&&b]"

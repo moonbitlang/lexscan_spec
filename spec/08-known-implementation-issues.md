@@ -74,3 +74,11 @@ The baseline toolchain rejects a written repetition bound greater than 256.
 This is a compilation limit, not a language-level regex limit. Other conforming
 implementations are not required to use the same number, and the conformance
 suite must not use 256 versus 257 as a semantic boundary.
+
+### IL-002: Groups are nested at most 64 levels deep
+
+Both the compiler and the runtime parser of `@string.Regex` reject a regex
+whose groups are nested more than 64 levels deep, so that parsing cannot
+overflow the stack. Groups that follow each other do not add depth. Like
+IL-001, this is a resource limit, not regex matching semantics, and the
+conformance suite does not use 64 versus 65 as a semantic boundary.

@@ -1,0 +1,2 @@
+// RX-049
+const BYTE = re"\x41"
