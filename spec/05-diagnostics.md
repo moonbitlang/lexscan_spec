@@ -8,10 +8,11 @@ documents are approved. Exact prose and source ranges are informative unless a
 future test explicitly pins them.
 
 Some invalid programs may produce an additional shadowed or recovery
-diagnostic. For example, an invalid longest-match regex may also produce a
-secondary anchoring diagnostic during error recovery. Conformance tests SHOULD
-assert the primary diagnostic and tolerate documented recovery noise unless
-source-range behavior is itself under test.
+diagnostic. Conformance tests SHOULD assert the primary diagnostic and tolerate
+documented recovery noise unless source-range behavior is itself under test.
+The diagnostics that section 2 excludes for an arm whose pattern has an error,
+such as an anchoring diagnostic for an invalid longest-match regex, are not
+recovery noise: they MUST NOT be reported.
 
 ## 2. Regex syntax and pattern errors
 

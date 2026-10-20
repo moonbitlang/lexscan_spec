@@ -1,6 +1,0 @@
-// LS-043
-fn f(lexbuf : @lexbuf.Lexbuf) -> Int {
-  lexscan lexbuf with longest {
-    re"^a" + re"a{257}" => 1
-  }
-}

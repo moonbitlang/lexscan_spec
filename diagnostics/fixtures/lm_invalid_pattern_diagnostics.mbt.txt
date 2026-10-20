@@ -1,7 +1,7 @@
 // LM-036
 fn f(x : String) -> Int {
   lexmatch x {
-    (re"^a{257}" as c, after=_) => {
+    (re"^[z-a]" as c, after=_) => {
       ignore(c)
       1
     }
