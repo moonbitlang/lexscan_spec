@@ -1,0 +1,2 @@
+// RX-049
+const CONTROL = re"\cA"

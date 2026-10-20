@@ -1,0 +1,11 @@
+// LM-036
+fn f(x : String) -> Int {
+  lexmatch x {
+    (re"^a{257}" as c, after=_) => {
+      ignore(c)
+      1
+    }
+    (re"^b", after=_) => 2
+    _ => 3
+  }
+}

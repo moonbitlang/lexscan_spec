@@ -1,0 +1,2 @@
+// RX-049C
+const AND_AFTER_POSIX = re"[[:digit:]&&a]"

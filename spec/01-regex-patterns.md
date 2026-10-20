@@ -201,7 +201,14 @@ POSIX classes are ASCII-based. For example, `[[:alpha:]]` does not match `é`
 or a CJK character.
 
 A POSIX class MUST occur inside an outer character class. `[:digit:]` is
-invalid; `[[:digit:]]` is valid.
+invalid; `[[:digit:]]` is valid. More precisely, when the content of a class,
+after an optional leading `^`, starts with an unescaped `:`, an unescaped `:`
+that closes the class with at least one character between the two colons makes
+the class invalid: it is taken to be a POSIX class written without its outer
+brackets. So `[:digit:]`, `[^:alpha:]`, and `[:a-z:]` are invalid, while `[:]`,
+`[::]`, `[^::]`, `[:a-z]`, `[:a\:]`, and `[:!-:]` are ordinary classes. A colon
+that ends a range or is escaped does not count. Every class this rule rejects
+lists `:` twice, so listing it once, as in `[a-z:]`, gives the same set.
 
 The empty class `[]` matches no scalar value. Its negation `[^]` matches any
 scalar value.
@@ -215,26 +222,38 @@ class, `\d`, `\s`, and `\w` become `[:digit:]`, `[:space:]`, and `[:word:]`, as 
 because a class cannot contain a negated POSIX class; such a pattern has to be
 written differently, for example as an alternation.
 
-Within a character class, `-` starts a range. A literal hyphen MUST be written
-`\-`. Placing an unescaped hyphen at the beginning or end of a class is invalid.
+Within a character class, `-` starts a range between two single characters. A
+literal hyphen MUST be written `\-`. Placing an unescaped hyphen at the beginning
+or end of a class is invalid, and so is an unescaped hyphen after a range or a
+POSIX class, as in `[a-b-c]` or `[[:digit:]-a]`.
+
+`&&` after an item of a class (a character, a range, or a POSIX class) is
+reserved for class set operations, which are not supported, and is invalid, as
+in `[a&&b]`, `[a-z&&b]`, or `[[:digit:]&&a]`. At the start of a class, after an
+optional `^`, `&&` is two ordinary characters: `[&&a]` matches `&` or `a`. A
+single `&` is always ordinary.
+
 Other supported regex-punctuation escapes remain literal class atoms. For
 example, `[\[]`, `[\]]`, and `[\\]` match a left bracket, right bracket, and
-backslash respectively. A colon is ordinary unless it participates in the
-complete `[:name:]` syntax of a POSIX class.
+backslash respectively. Apart from the POSIX-class rule above, a colon is an
+ordinary character, and it can start or end a range.
 
 ### 3.5 Escapes
 
 Supported character escapes include:
 
 - `\f`, `\n`, `\r`, `\t`, and `\v`;
-- `\cA` through `\cZ` and their lowercase forms for control characters;
-- `\0` when used as a character-class escape and not followed by a decimal
-  digit; outside a character class, `\0` is parsed as an unsupported numeric
-  backreference;
-- `\xHH` with exactly two hexadecimal digits;
 - `\uHHHH` with exactly four hexadecimal digits;
-- `\u{H...}` for a scalar value no greater than U+10FFFF; and
+- `\u{H...}` with one to six hexadecimal digits, for a scalar value no greater
+  than U+10FFFF; leading zeros are allowed within the six digits, as in
+  `\u{000041}`; and
 - escapes for regex punctuation such as `^ $ \\ . * + ? ( ) [ ] } | / "`.
+
+The byte escape `\xHH`, the control escape `\cX`, and the NUL escape `\0` are
+not supported in a string regex. They are invalid inside and outside a
+character class, with or without following digits. Write the character with a
+Unicode escape instead: `\u{41}` for `\x41`, `\u{1}` for `\cA`, and `\u{0}` for
+`\0`.
 
 An escape of an otherwise ordinary character is invalid. A literal `{` MUST be
 written `[{]`; `\{` begins MoonBit regex interpolation rather than denoting a
@@ -247,8 +266,10 @@ Regex interpolation is not a supported expression or pattern feature. If
 interpolated-regex token is rejected rather than evaluating that source to
 construct a regex dynamically.
 
-Inside a character class, `\b` denotes backspace and `\-` denotes a literal
-hyphen.
+Inside a character class, `\b` denotes backspace, and `\-`, `\&`, and `\:`
+denote a literal hyphen, ampersand, and colon: `-` makes a range, `&&` would be a
+class set operation, and `[:` starts a POSIX class. Outside a class these
+characters are not special, and `\-`, `\&`, and `\:` are invalid.
 
 Each Unicode escape sequence MUST denote a Unicode scalar value. Both fixed
 and braced escapes in the surrogate range U+D800 through U+DFFF are invalid,

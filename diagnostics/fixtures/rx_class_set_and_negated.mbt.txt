@@ -1,0 +1,2 @@
+// RX-049C
+const NEGATED_AND = re"[^a&&b]"
