@@ -1,8 +1,0 @@
-// RX-029
-const DIGIT = re"\d"
-const NOT_DIGIT = re"\D"
-const SPACE = re"\s"
-const NOT_SPACE = re"\S"
-const WORD = re"\w"
-const NOT_WORD = re"\W"
-const IN_CLASS = re"[\d_]"

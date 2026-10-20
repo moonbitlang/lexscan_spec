@@ -1,0 +1,2 @@
+// RX-029
+const SHORTHAND_SPACE_IN_CLASS = re"[\s_]"

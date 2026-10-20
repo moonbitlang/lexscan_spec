@@ -1,0 +1,2 @@
+// RX-029
+const SHORTHAND_DIGIT = re"\d"

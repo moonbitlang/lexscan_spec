@@ -209,8 +209,11 @@ scalar value.
 The shorthand escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are not part of
 the language. They are invalid inside and outside a character class and are
 rejected with E4172. Outside a class, write `[[:digit:]]`, `[^[:digit:]]`,
-`[[:space:]]`, `[^[:space:]]`, `[[:word:]]`, or `[^[:word:]]` instead; inside a
-class, write `[:digit:]`, `[:space:]`, or `[:word:]`, as in `[[:digit:]_]`.
+`[[:space:]]`, `[^[:space:]]`, `[[:word:]]`, or `[^[:word:]]` instead. Inside a
+class, `\d`, `\s`, and `\w` become `[:digit:]`, `[:space:]`, and `[:word:]`, as in
+`[[:digit:]_]`. `\D`, `\S`, and `\W` have no direct replacement inside a class,
+because a class cannot contain a negated POSIX class; such a pattern has to be
+written differently, for example as an alternation.
 
 Within a character class, `-` starts a range. A literal hyphen MUST be written
 `\-`. Placing an unescaped hyphen at the beginning or end of a class is invalid.

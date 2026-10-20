@@ -32,7 +32,7 @@ test "RX-048A non-word-boundary assertion" {
 }
 
 ///|
-test "RX-048 RX-048A boundaries in lexmatch and in Regex values" {
+test "RX-048 boundaries in lexmatch and in Regex values" {
   let classify = fn(s : String) -> String {
     lexmatch s {
       (re"^if\b", after=_) => "keyword"
