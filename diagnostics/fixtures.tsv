@@ -145,4 +145,5 @@ rx_bare_posix_escaped_bracket	error	E4172	-	-
 lm_invalid_pattern_diagnostics	error	E4172	E0080,E0081,E0090	-
 lm_unexpected_token_pattern	error	E3002	E0080,E0081,E0090	-
 lm_invalid_pattern_longest_body_checked	error	E4172,E4014	E4218,E0002	-
-ls_invalid_pattern_diagnostics	error	E4172	E4218,E4224	lexbuf
+ls_invalid_pattern_without_catchall	error	E4172	E4224	lexbuf
+ls_invalid_pattern_unanchored	error	E4172	E4218	lexbuf
