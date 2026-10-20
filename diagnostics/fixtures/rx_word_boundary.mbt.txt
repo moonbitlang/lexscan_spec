@@ -1,3 +1,4 @@
-// RX-032 RX-032A
-const WORD_BOUNDARY = re"\bword\b"
-const NON_WORD_BOUNDARY = re"\Bword\B"
+// RX-048B
+const QUANTIFIED_BOUNDARY = re"a\b*"
+const QUANTIFIED_NON_BOUNDARY = re"a\B+"
+const NON_BOUNDARY_IN_CLASS = re"[\B]"

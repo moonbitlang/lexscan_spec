@@ -33,6 +33,7 @@ rx_negative_lookahead	error	E4172	-	-
 rx_lookbehind	error	E4172	-	-
 rx_backreference	error	E4172	-	-
 rx_word_boundary	error	E4172	-	-
+rx_word_boundary_not_anchor	error	E4218	-	-
 rx_hidden_capture_scope	error	E4021	-	lexbuf
 rx_alias_grammar_errors	error	-	-	-
 rx_quantified_start_anchor	error	E4172	-	-
@@ -49,7 +50,7 @@ rx_interpolation_not_escape	error	-	-	-
 rx_interpolation_attempt	error	-	-	-
 rx_leading_hyphen	error	E4172	-	-
 rx_trailing_hyphen	error	E4172	-	-
-rx_deprecated_shorthand	warning	E0027	-	-
+rx_shorthand_class_escape	error	E4172	E0027	-
 rx_empty_language_warning	warning	E0090	-	-
 rm_target_and_bindings	error	E4014,E4081,E4208,E4209	-	-
 rm_target_kinds	error	E4014	-	lexbuf

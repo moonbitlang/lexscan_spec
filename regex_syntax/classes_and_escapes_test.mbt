@@ -104,17 +104,6 @@ test "RX-025B escaped regex punctuation is literal in classes" {
 }
 
 ///|
-#warnings("-deprecated_syntax")
-test "RX-029 deprecated shorthand classes retain matching behavior" {
-  assert_true("5" =~ re"^\d$")
-  assert_true("x" =~ re"^\D$")
-  assert_true("\n" =~ re"^\s$")
-  assert_true("x" =~ re"^\S$")
-  assert_true("_" =~ re"^\w$")
-  assert_true("!" =~ re"^\W$")
-}
-
-///|
 test "RX-030 RX-031B escapes and non-BMP scalar values" {
   assert_true("\u{c}" =~ re"^\f$")
   assert_true("\n" =~ re"^\n$")

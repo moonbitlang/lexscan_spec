@@ -116,6 +116,8 @@ The following atoms are supported:
 | `(?i:...)` | ASCII case-insensitive scoped group |
 | `^` | beginning of logical input |
 | `$` | end of logical input |
+| `\b` | word boundary (section 3.8) |
+| `\B` | not a word boundary (section 3.8) |
 
 The case-insensitive modifier folds only ASCII `A`-`Z` and `a`-`z`. It is not
 full Unicode case folding.
@@ -157,8 +159,8 @@ The following greedy quantifiers are supported:
 | `x{n,m}` | between `n` and `m`, inclusive |
 
 The operand `x` MUST be a regex atom or group. A direct zero-width assertion
-`^` or `$` is not a valid quantifier operand, so `^+`, `$?`, and similar forms
-are invalid. A group is a valid operand even when its contents are zero-width;
+`^`, `$`, `\b`, or `\B` is not a valid quantifier operand, so `^+`, `$?`,
+`\b*`, and similar forms are invalid. A group is a valid operand even when its contents are zero-width;
 therefore grouped forms such as `(^){2}`, `(?:^)+`, and `(?i:^)?` are valid.
 Repeating such a group still consumes no input. As with every nullable
 repetition, evaluation MUST terminate without inventing input progress.
@@ -204,9 +206,11 @@ invalid; `[[:digit:]]` is valid.
 The empty class `[]` matches no scalar value. Its negation `[^]` matches any
 scalar value.
 
-The shorthand escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are currently
-accepted but emit warning E0027 (`deprecated_syntax`). Their replacements are
-the corresponding POSIX classes and negated POSIX classes.
+The shorthand escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are not part of
+the language. They are invalid inside and outside a character class and are
+rejected with E4172. Outside a class, write `[[:digit:]]`, `[^[:digit:]]`,
+`[[:space:]]`, `[^[:space:]]`, `[[:word:]]`, or `[^[:word:]]` instead; inside a
+class, write `[:digit:]`, `[:space:]`, or `[:word:]`, as in `[[:digit:]_]`.
 
 Within a character class, `-` starts a range. A literal hyphen MUST be written
 `\-`. Placing an unescaped hyphen at the beginning or end of a class is invalid.
@@ -253,8 +257,6 @@ character or a braced scalar escape such as `\u{1f600}` instead.
 
 The following constructs are rejected by the current regex parser:
 
-- word-boundary and non-word-boundary assertions `\b` and `\B` outside a
-  character class;
 - numeric and named backreferences;
 - positive or negative lookahead;
 - positive or negative lookbehind;
@@ -269,7 +271,8 @@ textual checks for the first or last character of a literal.
 
 A regex is semantically start-anchored according to these rules:
 
-- `^` is start-anchored; ordinary characters, the empty regex, and `$` are not;
+- `^` is start-anchored; ordinary characters, the empty regex, `$`, `\b`, and
+  `\B` are not;
 - a concatenation is start-anchored if any constituent is start-anchored;
 - an alternation is start-anchored only if every alternative is start-anchored;
 - a repetition is start-anchored only if its minimum count is positive and its
@@ -285,6 +288,33 @@ Consequently, an anchor may be introduced by a referenced constant or a nested
 group. For example, a constant containing `^` remains start-anchored when it is
 concatenated with another pattern. Quantifying the anchor itself is invalid and
 is not a way to establish anchoring.
+
+### 3.8 Word-boundary assertions
+
+`\b` and `\B` are zero-width assertions. They consume no input.
+
+A word character is an ASCII letter, an ASCII digit, or `_`, the members of
+`[[:word:]]`. Every other scalar value, including a non-ASCII letter such as
+`é`, is a non-word character. Case-insensitive groups do not change which
+characters are word characters.
+
+`\b` holds at a position where exactly one of the scalar value before it and
+the scalar value after it is a word character. The start and the end of the
+logical input count as non-word characters, so `re"^\bcat\b$"` matches
+`"cat"`, and `\b` never holds in an empty input. `\B` holds wherever `\b` does
+not.
+
+As for `^` and `$`, the logical input is the target that one `=~`,
+`lexmatch`, or `lexscan` examines. A `StringView` slice is the whole input: the
+characters outside the slice are not consulted. A `lexscan` that needs the
+scalar value after a boundary may read it from the scanner before committing
+the match; it does not consume it.
+
+`\b` and `\B` behave the same in regex match expressions, `lexmatch`, `lexscan`,
+and first-class `Regex` values, under both strategies. They are not anchors
+(section 3.7), and they cannot be quantified directly (section 3.3); a group
+containing one can. Inside a character class `\b` denotes backspace, and `\B`
+is invalid.
 
 ## 4. Pattern-level capture with `as`
 

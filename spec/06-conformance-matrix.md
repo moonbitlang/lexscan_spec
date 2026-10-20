@@ -62,7 +62,7 @@ Priority labels:
 | RX-027 | P1 | bare POSIX class rejected | E4172 |
 | RX-028 | P1 | unsupported POSIX class rejected | E4172 |
 | RX-028A | P1 | an unclosed POSIX character class is rejected | E4172 |
-| RX-029 | P1 | `\d`/`\s`/`\w` families accepted with E0027 | warning + runtime |
+| RX-029 | P1 | `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are rejected inside and outside classes, without E0027 | E4172 |
 | RX-030 | P0 | control, character-class NUL, hex, fixed Unicode, and braced Unicode escapes | runtime |
 | RX-031 | P1 | malformed escape variants rejected with precise primary error | E4172 |
 | RX-031A | P1 | incomplete, non-hex, unclosed, empty, overflow, and invalid-control escape variants are rejected | E4172 |
@@ -71,8 +71,8 @@ Priority labels:
 | RX-031D | P1 | regex interpolation is not a pattern feature; an attempted interpolation is rejected rather than evaluated | parse/typing negative |
 | RX-031E | P1 | empty, digit-leading, punctuation-containing, and unclosed named-capture identifiers are rejected | E4172 |
 | RX-031F | P1 | `\0` outside a class is an unsupported numeric backreference, while an isolated-surrogate escape is invalid inside a class as well as outside it | E4172 |
-| RX-032 | P1 | unsupported lookaround/backreference/boundary constructs | E4172 |
-| RX-032A | P1 | positive and negative lookahead, positive and negative lookbehind, numeric and named backreferences, and both boundary assertions are rejected individually | E4172 |
+| RX-032 | P1 | unsupported lookaround/backreference constructs | E4172 |
+| RX-032A | P1 | positive and negative lookahead, positive and negative lookbehind, and numeric and named backreferences are rejected individually | E4172 |
 | RX-032B | P1 | both character-class intersection and subtraction spellings are rejected as unsupported class-set expressions | E4172 |
 | RX-033 | P0 | `(?i:...)` folds ASCII letters | runtime |
 | RX-034 | P1 | `(?i:...)` does not perform Unicode case folding | runtime |
@@ -97,6 +97,10 @@ Priority labels:
 | RX-045 | P1 | empty language `[]` never matches | runtime + warning interaction |
 | RX-046 | P1 | direct `^` and `$` assertions cannot be quantified, while grouped zero-width forms such as `(^){2}` remain valid | E4172 + runtime |
 | RX-047 | P1 | `[{]` and `[}]` match literal braces; class hyphen uses `\-`; incompatible left-brace and hyphen forms are rejected | runtime + E4172/parse negative |
+| RX-048 | P1 | `\b` holds between an ASCII word character and a non-word character, with the input edges as non-word and a slice as the whole input, in `=~`, `lexmatch`, and `Regex` values; `[\b]` is backspace | runtime |
+| RX-048A | P1 | `\B` holds wherever `\b` does not, including in an empty input | runtime |
+| RX-048B | P1 | `\b` and `\B` cannot be quantified directly, and `\B` is invalid inside a class | E4172 |
+| RX-048C | P1 | a word boundary is not an anchor: a `\b`-headed pattern under `longest` is unanchored | E4218 |
 
 ## 3. Regex match expression (`=~`)
 

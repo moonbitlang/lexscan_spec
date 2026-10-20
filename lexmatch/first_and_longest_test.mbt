@@ -178,7 +178,7 @@ test "LM-015C longest retries after a partial-prefix failure" {
 test "LM-019 LM-020 LM-020A result typing body and target evaluation" {
   let mut first_runs = 0
   let mut second_runs = 0
-  let result : Int = lexmatch "a" {
+  let result : Int32 = lexmatch "a" {
     re"^a$" => {
       first_runs += 1
       10

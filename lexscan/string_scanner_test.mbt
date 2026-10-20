@@ -187,7 +187,7 @@ test "LS-031 LS-032A empty match neither warns nor advances" {
 }
 
 ///|
-fn count_until_eof(scanner : @lexbuf.StringScanner) -> Int {
+fn count_until_eof(scanner : @lexbuf.StringScanner) -> Int32 {
   let mut count = 0
   for ;; {
     let done = lexscan scanner {
@@ -205,7 +205,7 @@ fn count_until_eof(scanner : @lexbuf.StringScanner) -> Int {
 }
 
 ///|
-fn recursive_count(scanner : @lexbuf.StringScanner, count : Int) -> Int {
+fn recursive_count(scanner : @lexbuf.StringScanner, count : Int32) -> Int32 {
   lexscan scanner {
     re"^$" => count
     re"^." => recursive_count(scanner, count + 1)
