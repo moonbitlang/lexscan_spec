@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 244 independently testable requirements. The
-ordinary runtime/type layer contains 133 tests; diagnostic fixtures and format
+The current matrix contains 252 independently testable requirements. The
+ordinary runtime/type layer contains 137 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:

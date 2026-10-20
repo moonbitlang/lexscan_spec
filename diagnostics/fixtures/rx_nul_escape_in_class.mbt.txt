@@ -1,0 +1,2 @@
+// RX-049
+const NUL_IN_CLASS = re"[\0]"

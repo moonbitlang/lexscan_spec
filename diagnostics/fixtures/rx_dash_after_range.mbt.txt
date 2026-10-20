@@ -1,0 +1,2 @@
+// RX-049D
+const DASH_AFTER_RANGE = re"[a-b-c]"

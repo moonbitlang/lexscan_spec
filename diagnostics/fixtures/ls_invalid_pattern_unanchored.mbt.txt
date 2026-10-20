@@ -1,0 +1,7 @@
+// LS-043
+fn f(lexbuf : @lexbuf.Lexbuf) -> Int {
+  lexscan lexbuf {
+    re"[z-a]" => 1
+    _ => 0
+  }
+}

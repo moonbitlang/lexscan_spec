@@ -1,0 +1,7 @@
+// LM-036
+fn f(x : String) -> Int {
+  lexmatch x with longest {
+    (re"[z-a]", after=_) => 1
+    _ => "two"
+  }
+}

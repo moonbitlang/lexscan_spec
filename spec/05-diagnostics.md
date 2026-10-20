@@ -8,10 +8,11 @@ documents are approved. Exact prose and source ranges are informative unless a
 future test explicitly pins them.
 
 Some invalid programs may produce an additional shadowed or recovery
-diagnostic. For example, an invalid longest-match regex may also produce a
-secondary anchoring diagnostic during error recovery. Conformance tests SHOULD
-assert the primary diagnostic and tolerate documented recovery noise unless
-source-range behavior is itself under test.
+diagnostic. Conformance tests SHOULD assert the primary diagnostic and tolerate
+documented recovery noise unless source-range behavior is itself under test.
+The diagnostics that section 2 excludes for an arm whose pattern has an error,
+such as an anchoring diagnostic for an invalid longest-match regex, are not
+recovery noise: they MUST NOT be reported.
 
 ## 2. Regex syntax and pattern errors
 
@@ -32,10 +33,29 @@ invalid. Conditions include:
 - an unsupported POSIX class;
 - lookaround or backreferences;
 - a shorthand class escape `\d`, `\D`, `\s`, `\S`, `\w`, or `\W`;
+- a byte, control, or NUL escape `\xHH`, `\cX`, or `\0`;
+- a braced Unicode escape with more than six hexadecimal digits;
+- an escaped `&`, `:`, or `-` outside a character class;
+- `&&` after an item of a character class;
+- a hyphen after a range or a POSIX class;
+- a class that starts and ends with `:`, taken as a POSIX class without its
+  outer brackets;
+- groups nested more than 64 levels deep;
 - character-class set intersection or subtraction;
 - a malformed group modifier;
 - duplicate named captures in a first-class regex literal; and
 - a non-greedy quantifier under the `longest` strategy.
+
+### Diagnostics of an arm whose pattern has an error
+
+When the regex pattern of a `lexmatch` or `lexscan` arm has an error that
+replaces part of it with a placeholder (an invalid regex literal, a literal the
+parser recovered from a syntax error, or a reference that is not a `Regex`
+constant), the error is reported and nothing that depends on what the pattern
+matches is: neither E0080, E0081, nor E4218 for that arm, nor E0090 or E4224 for
+the expression. The arm bodies are still type-checked, and their errors are
+reported. A pattern with an error that does not replace it, such as a named
+capture in a direct lexical regex literal (E4181), keeps all its checks.
 
 ### E4181 — Named capture in a direct lexical regex literal
 

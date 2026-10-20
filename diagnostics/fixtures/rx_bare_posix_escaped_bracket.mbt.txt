@@ -1,0 +1,2 @@
+// RX-049E
+const BARE_ESCAPED_BRACKET = re"[:a\]:]"
