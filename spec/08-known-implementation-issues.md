@@ -35,6 +35,12 @@ be used as a portable way to establish semantic anchoring.
 
 ### KI-002: An isolated-surrogate regex escape may not fail normally
 
+**Status:** Resolved in the publicly released compiler
+`moonc v0.10.16+b1a0e846e (2026-10-16)`, verified against the existing diagnostic
+fixtures. The compiler rejects isolated surrogate escapes and adjacent high/low
+escape pairs with E4172, inside and outside character classes. The original
+baseline behavior below is retained for historical context.
+
 An isolated surrogate is not a Unicode scalar value and cannot be expressed by
 the regex language. Such a regex must be rejected as invalid.
 
@@ -49,6 +55,10 @@ the specification. The compiler must also reject them normally with E4172;
 acceptance or an internal compiler error remains an implementation defect.
 
 ### KI-003: An empty braced Unicode escape is accepted
+
+**Status:** Resolved; `moonc v0.10.16+b1a0e846e (2026-10-16)` rejects `\u{}` with
+E4172, verified against the existing diagnostic fixtures. The original baseline
+behavior below is retained for historical context.
 
 The regex grammar requires at least one hexadecimal digit in `\u{H...}`. The
 baseline toolchain accepts `\u{}` instead of rejecting it as an invalid regex.

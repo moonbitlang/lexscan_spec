@@ -1,0 +1,2 @@
+// RX-048B
+const QUANTIFIED_NON_BOUNDARY = re"a\B+"

@@ -11,7 +11,7 @@ fn canonical(input : String) -> Bool {
 }
 
 ///|
-fn lexical(input : String, scanner : @lexbuf.StringScanner) -> Int {
+fn lexical(input : String, scanner : @lexbuf.StringScanner) -> Int32 {
   let a = lexmatch input with first {
     (re"a" as item, after~, before~) => item.to_int()
     rest => rest.length()

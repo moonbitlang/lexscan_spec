@@ -1,0 +1,2 @@
+// RX-048B
+const QUANTIFIED_BOUNDARY = re"a\b*"

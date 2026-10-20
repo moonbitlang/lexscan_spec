@@ -65,7 +65,8 @@ lexmatch input {
 }
 ```
 
-Current toolchain behavior differs by spelling:
+The original baseline (`moonc v0.10.8+8606a5800`) behaved differently for the two
+spellings:
 
 ```moonbit
 lexmatch input {
@@ -83,7 +84,7 @@ lexmatch input {
 }
 ```
 
-This instead reports E4216 with the wording “Binder pattern in lexscan
+This instead reported E4216 with the wording “Binder pattern in lexscan
 catch-all case is not supported.” The same E4216 is appropriate for a binder
 catch-all in `lexscan`, where binder catch-alls are invalid even when final. It
 does not accurately describe this `lexmatch` program: `rest` is supported as a
@@ -101,7 +102,8 @@ Expected design options:
    `lexmatch` forms.
 
 Resolved: use E4171 for both non-final `lexmatch` forms. E4216 remains specific
-to binder catch-alls in `lexscan`.
+to binder catch-alls in `lexscan`. The current baseline implements this: both
+programs above report E4171.
 
 Test impact:
 

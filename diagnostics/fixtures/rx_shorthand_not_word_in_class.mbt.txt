@@ -1,0 +1,2 @@
+// RX-029
+const SHORTHAND_NOT_WORD_IN_CLASS = re"[\W_]"

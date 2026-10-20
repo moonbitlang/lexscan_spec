@@ -23,14 +23,15 @@ invalid. Conditions include:
 - an unclosed group, character class, or POSIX class;
 - a malformed or unsupported escape;
 - a quantifier without an atom;
-- a quantifier applied to `^` or `$`;
+- a quantifier applied directly to `^`, `$`, `\b`, or `\B`;
 - a Unicode escape in the surrogate range, including adjacent high/low
   surrogate escapes;
 - a repetition minimum greater than its maximum;
 - a descending character range;
 - a range over character sets;
 - an unsupported POSIX class;
-- lookaround, backreferences, or word-boundary assertions;
+- lookaround or backreferences;
+- a shorthand class escape `\d`, `\D`, `\s`, `\S`, `\w`, or `\W`;
 - character-class set intersection or subtraction;
 - a malformed group modifier;
 - duplicate named captures in a first-class regex literal; and
@@ -207,13 +208,12 @@ It covers:
 
 The unreachable body remains type-checked.
 
-### E0027 — Deprecated shorthand character-class escape
-
-The shorthand class escapes `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are
-accepted with E0027. Use POSIX character classes instead.
-
 ## 8. Removed and unused historical diagnostics
 
 Diagnostics associated only with earlier experimental lexical-pattern designs
 MUST NOT be used to infer current syntax. In particular, string-piece pattern
 errors and `lexmatch?` diagnostics are outside this specification.
+
+Warning E0027 (`deprecated_syntax`) was emitted for the shorthand class escapes
+`\d`, `\D`, `\s`, `\S`, `\w`, and `\W` while they were deprecated. They are
+now rejected with E4172, and E0027 is not emitted for regex syntax.

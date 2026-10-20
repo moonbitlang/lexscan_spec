@@ -1,0 +1,2 @@
+// RX-048B
+const NON_BOUNDARY_IN_CLASS = re"[\B]"

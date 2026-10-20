@@ -402,7 +402,7 @@ test "LS-040 result typing and selected body evaluation" {
   let input = @lexscan.chunked(["a"])
   let mut selected_runs = 0
   let mut unselected_runs = 0
-  let result : Int = lexscan input {
+  let result : Int32 = lexscan input {
     re"^a" => {
       selected_runs += 1
       1
@@ -695,4 +695,26 @@ test "LS-037 backend-neutral scanning semantics" {
   assert_eq(number, "12")
   assert_eq(face, '😀')
   assert_eq(input.__get_cursor(), 6)
+}
+
+///|
+test "RX-048 a boundary in lexscan looks at the next character without consuming it" {
+  let classify = fn(input : @lexbuf.Lexbuf) -> String {
+    lexscan input {
+      re"^if\b" => "keyword"
+      re"^[a-z]+" => "identifier"
+      _ => "other"
+    }
+  }
+  // The character after the boundary comes from a later chunk.
+  let input = @lexscan.chunked(["i", "f", " x"])
+  inspect(classify(input), content="keyword")
+  inspect(input.__get_cursor(), content="2")
+  let input = @lexscan.chunked(["if", "fy"])
+  inspect(classify(input), content="identifier")
+  inspect(input.__get_cursor(), content="4")
+  // The end of the input counts as a non-word character.
+  let input = @lexscan.chunked(["if"])
+  inspect(classify(input), content="keyword")
+  inspect(input.__get_cursor(), content="2")
 }
