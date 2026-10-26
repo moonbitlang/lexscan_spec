@@ -12,6 +12,8 @@ input =~ regex_pattern
 Its result type is `Bool`.
 
 Use `lexmatch` instead when several regex cases must produce different values.
+[Performance guidance](09-performance-guidance.md) (informative) describes
+which forms compile to a plain string comparison.
 
 ## 2. Syntax
 
