@@ -51,12 +51,17 @@ match meets conditions 1 and 2 above and the pattern
 
 - is anchored with `^`, `$` or both (a search for several literals still uses
   an automaton);
+- has no alternation of single characters, at any level: `(a|b)` is the
+  character class `[ab]`, so `^(a|b)$` and `^x(a|b)$` still use an automaton,
+  while `^(ab|cd)$` does not;
 - expands to at most 8 strings; and
-- needs at most 64 code-unit comparisons in the generated code (not
-  comparisons executed at run time). One comparison is generated per UTF-16
-  code unit, a code unit that several literals share at the start (at the end
-  for a `$` pattern) counts once, and a `^...$` pattern counts its literals of
-  each length separately.
+- needs at most 64 code-unit comparisons for the whole set, counted before
+  alternatives that can never decide the match are dropped. One comparison is
+  counted per UTF-16 code unit, a code unit that several literals share at the
+  start (at the end for a `$` pattern) counts once, and a `^...$` pattern
+  counts its literals of each length separately. So `^(a|aaa...)` with a
+  second literal of 65 units uses an automaton, although under first-match
+  only `a` can decide it.
 
 The input is compared code unit by code unit. Code units shared by several
 literals are compared once, and the comparison branches where the literals
