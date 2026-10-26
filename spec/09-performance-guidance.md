@@ -12,14 +12,17 @@ other chapters, however it is compiled.
 with no regex automaton, when all of these hold:
 
 1. It is a regex match expression (`=~`), or a `lexmatch` with exactly one
-   regex case followed by a catch-all `_` case. A `lexmatch` with several regex
-   cases, and every `lexscan`, uses an automaton.
+   regex case followed by a catch-all case (`_` or a binder such as
+   `rest => ...`). A `lexmatch` with several regex cases, and every `lexscan`,
+   uses an automaton.
 2. The case has no pattern-level `as` binding. `before` and `after` bindings do
    not matter.
 3. The pattern is one literal string between an optional leading `^` and an
-   optional trailing `$`. Escaped characters such as `\.` and character
-   classes with one member such as `[.]` count as literal characters, and
-   parentheses that only group are ignored.
+   optional trailing `$`. Every character of it must stand for exactly one
+   character: an ordinary or escaped character such as `\.`, a character
+   class with one member such as `[.]`, or a character in a case-insensitive
+   group that has no other case, such as the digit in `(?i:0)`. Parentheses
+   that only group are ignored.
 
 | Pattern | Compiled as |
 | --- | --- |
@@ -31,24 +34,29 @@ with no regex automaton, when all of these hold:
 `before` and `after` are then views computed from the match position and the
 literal's length, with no further scan.
 
-Every other match uses an automaton. That includes an alternation of strings
-such as `^(if|else)` in these releases, any character class with more than one
-member such as `[0-9]`, `.`, case-insensitive groups `(?i:...)`, repetition,
-and assertions other than the outer `^` and `$`, such as `\b`.
+Every other match uses an automaton. That includes, in these releases, an
+alternation of strings such as `^(if|else)`, a character class with more than
+one member such as `[0-9]`, `.`, a letter in a case-insensitive group such as
+`(?i:if)`, repetition, and assertions other than the outer `^` and `$`, such
+as `\b`.
 
-## 2. Literal sets in later compilers
+## 2. Literal sets in the next release
 
-Compilers after `v0.10.17` also compile a small set of literal strings without
-an automaton: an alternation of literals, possibly nested, such as
+This section describes compiler behavior that is not in a released compiler as
+of `v0.10.17`, and is expected in the release after it. Compilers from then on
+also compile a small set of literal strings without an automaton: an
+alternation of literals, possibly nested, such as
 `^(if|else|while)$`, `^(return|break|continue)` or `(\.mbt|\.mbti)$`, when the
 match meets conditions 1 and 2 above and the pattern
 
 - is anchored with `^`, `$` or both (a search for several literals still uses
   an automaton);
 - expands to at most 8 strings; and
-- needs at most 64 UTF-16 code-unit comparisons in total. Literals that share
-  leading code units (trailing ones for a `$` pattern) count them once, and a
-  `^...$` pattern counts each length separately.
+- needs at most 64 code-unit comparisons in the generated code (not
+  comparisons executed at run time). One comparison is generated per UTF-16
+  code unit, a code unit that several literals share at the start (at the end
+  for a `$` pattern) counts once, and a `^...$` pattern counts its literals of
+  each length separately.
 
 The input is compared code unit by code unit. Code units shared by several
 literals are compared once, and the comparison branches where the literals
@@ -60,9 +68,13 @@ To test for a fixed string, use `=~`, or a single-case `lexmatch` when the
 result is not `Bool`, with an anchored literal:
 
 ```moonbit
-if line =~ re"^#" { ... }                        // has_prefix
-if path =~ (re"\.mbt$", before=stem) { ... }     // has_suffix, stem by length
-lexmatch token {
+let is_comment = line =~ re"^#"                  // has_prefix
+let module_name = if path =~ (re"\.mbt$", before=stem) {
+  stem.to_owned()                                // has_suffix, stem by length
+} else {
+  path
+}
+let value = lexmatch token {
   (re"^0x", after=digits) => parse_hex(digits)   // has_prefix
   _ => parse_decimal(token)
 }
@@ -77,35 +89,27 @@ even when the bound text is a literal known in advance:
 
 ```moonbit
 // Uses an automaton: the `as` binding.
-if s =~ (re"^0x" as prefix, after=digits) { ... }
-// One has_prefix call; the prefix is "0x" anyway.
-if s =~ (re"^0x", after=digits) { ... }
-```
-
-For two or three literal cases with different results, a chain of `=~` tests
-is two or three direct comparisons, while a `lexmatch` with several cases runs
-an automaton:
-
-```moonbit
-let kind = if line =~ re"^#" {
-  Hash
-} else if line =~ re"^//" {
-  Slash
+let a = if s =~ (re"^0x" as prefix, after=digits) {
+  prefix.length() + digits.length()
 } else {
-  Other
+  0
 }
+// One has_prefix call; the prefix is "0x" anyway.
+let b = if s =~ (re"^0x", after=digits) { 2 + digits.length() } else { 0 }
 ```
 
-Measured against a two- or three-case `lexmatch` over the same literals, such
-a chain took 0.38 to 0.72 of the time on js, 0.21 to 0.38 on wasm-gc and 0.20
-to 0.42 on native. A `lexmatch` with several cases reads the input once
-whatever the number of cases. Use it when there are many cases, or when the
-cases are not literal strings.
+A `lexmatch` with several regex cases always uses an automaton, which reads
+the input once whatever the number of cases. Rewriting it as a chain of `=~`
+tests gives one comparison per case, but whether that is faster depends on the
+literals, the inputs and the target, so measure before choosing it. A chain
+also follows first-match order: it can select a different case than a
+`lexmatch ... with longest`, as for the input `"ab"` with cases `^a` and
+`^ab`.
 
 When only a few spellings can occur, list them as literal alternatives, such
 as `re"^(true|false)$"`, rather than writing a pattern that also accepts other
-strings, such as `re"^[a-z]+$"`, and checking the result again. Compilers after
-`v0.10.17` compare the alternatives directly.
+strings, such as `re"^[a-z]+$"`, and checking the result again. From the
+release after `v0.10.17`, the alternatives are compared directly.
 
 `s =~ re"^abc"` and `s.has_prefix("abc")` compile to the same call. Choose
 between them for readability; the regex form also gives `before` and `after`.

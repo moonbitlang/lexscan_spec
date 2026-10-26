@@ -14,8 +14,8 @@ lexmatch input [with first|longest] {
 ```
 
 Unlike `=~`, `lexmatch` is not restricted to `Bool`: its result is the common
-type of its case bodies. For a few literal cases, a chain of `=~` tests can be
-faster; see [Performance guidance](09-performance-guidance.md) (informative).
+type of its case bodies. [Performance guidance](09-performance-guidance.md)
+(informative) describes which forms compile to a plain string comparison.
 
 ## 2. Syntax
 
