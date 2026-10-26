@@ -35,17 +35,15 @@ For code generators and agents, in short (details and measurements in
 
 - Test for a fixed string with `=~` and an anchored literal: `s =~ re"^#"`,
   `s =~ (re"\.mbt$", before=stem)`. It compiles to one `==`, `has_prefix`,
-  `has_suffix` or `find` call, with no automaton. A `lexmatch` with one regex
-  case and a catch-all `_` compiles the same way.
+  `has_suffix` or `find` call, with no automaton.
 - Anchor with `^` and `$` when a prefix, suffix or whole input is meant; an
   unanchored pattern is a search.
 - Use `before` and `after` instead of an `as` binding when they give what is
   needed: any `as` binding makes the match use an automaton.
-- For two or three literal cases, a chain of `=~` tests is faster than a
-  `lexmatch` with several cases. Use `lexmatch` for many cases or patterns
-  that are not literal.
-- Compilers after `v0.10.17` also compare small anchored sets of literals,
-  such as `s =~ re"^(if|else|while)$"`, without an automaton.
+- A `lexmatch` with several regex cases always uses an automaton. A single
+  regex case followed by a catch-all compiles like `=~`.
+- From the release after `v0.10.17`, small anchored sets of literals, such as
+  `s =~ re"^(if|else|while)$"`, are also compared without an automaton.
 
 ## Project status
 
