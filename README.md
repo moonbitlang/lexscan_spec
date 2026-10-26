@@ -30,7 +30,7 @@ compiler materials.
 
 ## Writing fast matches
 
-For code generators and agents, in short (details and measurements in
+For code generators and agents, in short (details in
 [Performance guidance](spec/09-performance-guidance.md)):
 
 - Test for a fixed string with `=~` and an anchored literal: `s =~ re"^#"`,
