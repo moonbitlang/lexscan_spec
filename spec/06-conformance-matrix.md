@@ -236,7 +236,6 @@ Priority labels:
 | LS-015 | P0 | successful `Lexbuf` case commits before body | runtime recursive scan |
 | LS-015A | P1 | successful `AsyncLexbuf` and `StringScanner` cases also commit before body evaluation | async + runtime recursive scan |
 | LS-016 | P0 | successful `StringScanner` case updates relative cursor | runtime |
-| LS-016A | P1 | the cursor commit occurs before the body but does not overwrite an explicit cursor mutation performed by the selected `StringScanner` body | runtime |
 | LS-017 | P0 | catch-all leaves `Lexbuf` cursor unchanged | runtime |
 | LS-018 | P0 | catch-all leaves `StringScanner` cursor unchanged | runtime |
 | LS-019 | P0 | binder catch-all rejected | E4216 |

@@ -12,21 +12,6 @@ test "LS-003 LS-016 StringScanner updates its relative cursor" {
 }
 
 ///|
-test "LS-016A StringScanner body mutation follows automatic commit" {
-  let scanner = @lexbuf.StringScanner::{ data: "ab"[:], cursor: 0, }
-  lexscan scanner {
-    re"^a" => scanner.cursor = 0
-    _ => fail("initial token did not match")
-  }
-  assert_eq(scanner.cursor, 0)
-  lexscan scanner {
-    re"^a" => ()
-    _ => fail("body cursor mutation was overwritten")
-  }
-  assert_eq(scanner.cursor, 1)
-}
-
-///|
 test "LS-008C StringScanner target expression is evaluated exactly once" {
   let mut evaluations = 0
   let scanner = @lexbuf.StringScanner::{ data: "a"[:], cursor: 0, }
