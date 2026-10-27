@@ -119,15 +119,21 @@ halves are compared as integers, such as `0xD83D`.
 
 ### 2.3 `before` and `after`
 
-When `before` or `after` is bound and the literals differ in length, the code
-computes the length of the match, or -1 for no match, and the case body appears
-once. Which literal is the match follows the matching model:
+When a binding depends on where the match ends (`after` for a prefix test) or
+begins (`before` for a suffix test), and the literals that can be the match
+differ in length, the code computes the length of the match, or -1 for no
+match, and the case body appears once. Otherwise the boundary is known
+without it: `before` of a prefix test is empty, `after` of a suffix test is
+empty, and an exact test spans the whole input. Which literal is the match
+follows the matching model:
 
 - A prefix test under first-match takes the earliest alternative that matches,
   in source order.
 - A prefix test under `with longest` takes the longest one.
-- A suffix test takes the longest one, under either strategy: every match ends
-  at the end of the input, so the leftmost match is the longest.
+- A suffix test takes the longest one: every match ends at the end of the
+  input, so the leftmost match is the longest. Suffix tests occur only under
+  first-match, because `with longest` requires a pattern that starts with `^`
+  (error E4218).
 
 `(re"^(abc|a)", after=rest)`, where `abc` is tried first:
 
