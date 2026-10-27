@@ -1,0 +1,2 @@
+// RX-049A
+const SEVEN_DIGITS = re"\u{0000041}"

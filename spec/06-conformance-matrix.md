@@ -63,14 +63,14 @@ Priority labels:
 | RX-028 | P1 | unsupported POSIX class rejected | E4172 |
 | RX-028A | P1 | an unclosed POSIX character class is rejected | E4172 |
 | RX-029 | P1 | `\d`, `\D`, `\s`, `\S`, `\w`, and `\W` are rejected inside and outside classes, without E0027 | E4172 |
-| RX-030 | P0 | control, character-class NUL, hex, fixed Unicode, and braced Unicode escapes | runtime |
+| RX-030 | P0 | simple, fixed Unicode, and braced Unicode escapes | runtime |
 | RX-031 | P1 | malformed escape variants rejected with precise primary error | E4172 |
 | RX-031A | P1 | incomplete, non-hex, unclosed, empty, overflow, and invalid-control escape variants are rejected | E4172 |
 | RX-031B | P1 | fixed and braced surrogate escapes are rejected, including adjacent high/low escape pairs; literal non-BMP scalars and braced scalar escapes remain valid | E4172 + runtime |
 | RX-031C | P1 | scalar boundary values U+D7FF, U+E000, and U+10FFFF are expressible, while both fixed and braced isolated-surrogate forms are rejected | runtime + E4172 |
 | RX-031D | P1 | regex interpolation is not a pattern feature; an attempted interpolation is rejected rather than evaluated | parse/typing negative |
 | RX-031E | P1 | empty, digit-leading, punctuation-containing, and unclosed named-capture identifiers are rejected | E4172 |
-| RX-031F | P1 | `\0` outside a class is an unsupported numeric backreference, while an isolated-surrogate escape is invalid inside a class as well as outside it | E4172 |
+| RX-031F | P1 | an isolated-surrogate escape is invalid inside a class as well as outside it | E4172 |
 | RX-032 | P1 | unsupported lookaround/backreference constructs | E4172 |
 | RX-032A | P1 | positive and negative lookahead, positive and negative lookbehind, and numeric and named backreferences are rejected individually | E4172 |
 | RX-032B | P1 | both character-class intersection and subtraction spellings are rejected as unsupported class-set expressions | E4172 |
@@ -101,6 +101,12 @@ Priority labels:
 | RX-048A | P1 | `\B` holds wherever `\b` does not, including in an empty input | runtime |
 | RX-048B | P1 | `\b` and `\B` cannot be quantified directly, and `\B` is invalid inside a class | E4172 |
 | RX-048C | P1 | a word boundary is not an anchor: a `\b`-headed pattern under `longest` is unanchored | E4218 |
+| RX-049 | P1 | `\xHH`, `\cX`, and `\0` are rejected inside and outside a class | E4172 |
+| RX-049A | P1 | `\u{...}` takes one to six hexadecimal digits, leading zeros included; a seventh digit is rejected | runtime + E4172 |
+| RX-049B | P1 | `\&` and `\:` are literal class atoms; outside a class they are rejected | runtime + E4172 |
+| RX-049C | P1 | `&&` after a class item is rejected; at the start of a class it is two literal ampersands | runtime + E4172 |
+| RX-049D | P1 | a hyphen after a range or a POSIX class is rejected | E4172 |
+| RX-049E | P1 | a class whose content starts and ends with `:`, with something between, is rejected; `[::]`, `[^::]`, `[:a-z]`, and `[:!-:]` are ordinary classes | runtime + E4172 |
 
 ## 3. Regex match expression (`=~`)
 
@@ -196,6 +202,7 @@ Priority labels:
 | LM-033B | P1 | a non-final `...` placeholder is rejected by the catch-all ordering rule | E4171 |
 | LM-034 | P2 | old string-piece pattern and `lexmatch?` rejected | parse negative |
 | LM-035 | P2 | formatter canonicalizes strategies, regex cases, binding tuples, catch-alls, and placeholder cases | format |
+| LM-036 | P1 | an arm whose pattern has an error reports that error but no E0080, E0081, E0090, or E4218 derived from it, and the bodies are still type-checked | E4172/E3002 + absent codes |
 
 ## 5. `lexscan`
 
@@ -279,6 +286,7 @@ Priority labels:
 | LS-040 | P1 | case result types unify, only the selected body evaluates, and case guards are rejected | typing + runtime + parse negative |
 | LS-041 | P1 | an empty case list is non-exhaustive, and covering every scalar without EOF remains non-exhaustive | E4224 |
 | LS-042 | P2 | formatter canonicalizes strategies, regex cases, binding tuples, catch-alls, and placeholder cases | format |
+| LS-043 | P1 | a `lexscan` arm whose pattern has an error reports no E4218 or E4224 derived from it | E4172 + absent codes |
 
 ## 6. Cross-cutting test dimensions
 

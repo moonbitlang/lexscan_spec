@@ -1,0 +1,2 @@
+// RX-049B
+const COLON = re"\:"

@@ -8,8 +8,8 @@ baseline:
 
 | Item | Baseline |
 | --- | --- |
-| `moon` | `0.1.20261016` |
-| `moonc` | `v0.10.16+b1a0e846e` |
+| `moon` | `0.1.20261023` |
+| `moonc` | `v0.10.17+d971670cd` |
 
 It does not claim to describe later MoonBit releases unless they preserve the
 same behavior. Confirmed divergences in the baseline implementation are kept in

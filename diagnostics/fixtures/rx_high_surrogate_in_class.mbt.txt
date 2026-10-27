@@ -1,0 +1,2 @@
+// RX-031F
+const HIGH_SURROGATE_IN_CLASS = re"[\uD800]"

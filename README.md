@@ -7,8 +7,8 @@ This repository specifies the MoonBit language behavior of:
 - `lexscan` expressions over `@lexbuf.Lexbuf`, `@lexbuf.AsyncLexbuf`, and
   `@lexbuf.StringScanner`.
 
-The specification targets `moon 0.1.20261016` and `moonc
-v0.10.16+b1a0e846e`.
+The specification targets `moon 0.1.20261023` and `moonc
+v0.10.17+d971670cd`.
 
 The [published MoonBit v0.10.7 documentation](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan)
 is linked for comparison. Version differences and publicly reproducible
@@ -33,8 +33,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 244 independently testable requirements. The
-ordinary runtime/type layer contains 133 tests; diagnostic fixtures and format
+The current matrix contains 252 independently testable requirements. The
+ordinary runtime/type layer contains 137 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:

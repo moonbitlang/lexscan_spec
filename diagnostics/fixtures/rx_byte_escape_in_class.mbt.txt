@@ -1,0 +1,2 @@
+// RX-049
+const BYTE_IN_CLASS = re"[\x41]"
