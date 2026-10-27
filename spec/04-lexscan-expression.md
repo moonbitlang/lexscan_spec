@@ -81,9 +81,15 @@ beginning of its `data : StringView`. A sliced `StringView` remains bounded by
 that slice; scanning MUST NOT read outside it.
 
 A `StringScanner` presented to `lexscan` MUST satisfy
-`0 <= cursor && cursor <= data.length()`. The scanner API establishes this
-invariant for initially valid scanners. Behavior for a manually constructed or
-mutated scanner outside this range is not specified by this document.
+`0 <= cursor && cursor <= data.length()`, and its cursor MUST be at a
+character boundary of `data`: it MUST NOT be between the two code units of a
+surrogate pair. `lexscan` only moves the cursor to the end of a match, which
+keeps both properties for a scanner that has them. Behavior for a scanner that
+violates either is not specified by this document.
+
+Note (informative): `@lexbuf.StringScanner(data, cursor=...)`, added to the
+standard library by moonbitlang/core#4511 after `moonc v0.10.17`, aborts when
+the cursor violates either property.
 
 The meaning of `^` is “the scan origin,” not necessarily offset zero of the
 underlying full string or stream.
@@ -182,9 +188,8 @@ Therefore, recursive or subsequent `lexscan` calls made by the body begin after
 the consumed token.
 
 These steps do not reserve ownership of the scanner state after the body
-begins. In particular, a selected `StringScanner` body may explicitly mutate
-its public `cursor`; that mutation occurs after the automatic commit and is not
-overwritten when the expression returns.
+begins: the body may scan the same scanner again. This document does not
+specify the effect of assigning a `StringScanner`'s `cursor` directly.
 
 For `StringScanner`, the stored cursor is updated to the match end relative to
 `data`.
