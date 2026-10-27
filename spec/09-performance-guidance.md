@@ -43,29 +43,142 @@ as `\b`.
 ## 2. Literal sets in the next release
 
 This section describes compiler behavior that is not in a released compiler as
-of `v0.10.17`, and is expected in the release after it. Compilers from then on
-also compile a small set of literal strings without an automaton: an
-alternation of literals, possibly nested, such as
-`^(if|else|while)$`, `^(return|break|continue)` or `(\.mbt|\.mbti)$`, when the
-match meets conditions 1 and 2 above and the pattern
+of `v0.10.17`, and is expected in the release after it.
+
+### 2.1 Which patterns
+
+Compilers from then on also compile a small set of literal strings without an
+automaton: an alternation of literals, possibly nested, when the match meets
+conditions 1 and 2 of section 1 and the pattern
 
 - is anchored with `^`, `$` or both (a search for several literals still uses
   an automaton);
 - has no alternation of single characters, at any level: `(a|b)` is the
   character class `[ab]`, so `^(a|b)$` and `^x(a|b)$` still use an automaton,
   while `^(ab|cd)$` does not;
-- expands to at most 8 strings; and
+- expands to at most 8 strings, counting duplicates; and
 - needs at most 64 code-unit comparisons for the whole set, counted before
-  alternatives that can never decide the match are dropped. One comparison is
-  counted per UTF-16 code unit, a code unit that several literals share at the
-  start (at the end for a `$` pattern) counts once, and a `^...$` pattern
-  counts its literals of each length separately. So `^(a|aaa...)` with a
-  second literal of 65 units uses an automaton, although under first-match
-  only `a` can decide it.
+  alternatives that can never decide the match are dropped (section 2.3).
+  One comparison is counted per UTF-16 code unit, a code unit that several
+  literals share at the start (at the end for a `$` pattern) counts once, and
+  a `^...$` pattern counts its literals of each length separately. So
+  `^(a|aaa...)` with a second literal of 65 units uses an automaton, although
+  under first-match only `a` can decide it.
 
-The input is compared code unit by code unit. Code units shared by several
-literals are compared once, and the comparison branches where the literals
-differ. A `^...$` pattern compares the input's length first.
+| Pattern | Lowered | Why |
+| --- | --- | --- |
+| `^(if\|else\|while)$` | yes | three literals, branched by length first |
+| `^(return\|break\|continue)` | yes | prefix test |
+| `(\.mbt\|\.mbti\|\.md)$` | yes | suffix test, compared from the end |
+| `^x(a\|bc)(d\|ef)$` | yes | expands to `xad`, `xaef`, `xbcd`, `xbcef` |
+| `^(abcd\|abce\|abx)$` | yes | `abc` is compared once for `abcd` and `abce` |
+| `^(😀a\|😁b)` | yes | the shared high surrogate is compared once |
+| `^(\|a)` | yes | the empty string is a literal |
+| `(if\|else)` | no | a search |
+| `^(a\|b)`, `^x(a\|b)$` | no | `(a\|b)` is the class `[ab]` |
+| `^(?i:if\|else)` | no | case-insensitive letters are classes |
+| `(a\|bb)(c\|dd)(e\|ff)(g\|hh)$` | no | 16 strings |
+| `^(ab\|ab\|ab\|ab\|ab\|ab\|ab\|ab\|ab)` | no | 9 strings, counting duplicates |
+
+### 2.2 Generated code
+
+The input is compared code unit by code unit as a trie: each code unit of the
+input is read at most once, a code unit shared by several literals is compared
+once, and a `match` branches where the literals differ. A length test appears
+only where a remaining literal needs more code units than an earlier test
+checked. The following shows the shape of the code for some patterns, written
+in MoonBit with `input` for the matched `StringView`.
+
+`s =~ re"^(return|break|continue)"`:
+
+```moonbit
+input.length() >= 5 &&
+(match input.unsafe_get(0) {
+  'r' => input.length() >= 6 && input.unsafe_get(1) == 'e' && ... && input.unsafe_get(5) == 'n'
+  'b' => input.unsafe_get(1) == 'r' && ... && input.unsafe_get(4) == 'k'
+  'c' => input.length() >= 8 && input.unsafe_get(1) == 'o' && ... && input.unsafe_get(7) == 'e'
+  _ => false
+})
+```
+
+A `^...$` pattern branches on the length first, then compares the literals of
+that length. `s =~ re"^(abcd|abce|abx)$"`:
+
+```moonbit
+match input.length() {
+  4 => input.unsafe_get(0) == 'a' && input.unsafe_get(1) == 'b' && input.unsafe_get(2) == 'c' &&
+       (match input.unsafe_get(3) { 'd' | 'e' => true; _ => false })
+  3 => input.unsafe_get(0) == 'a' && input.unsafe_get(1) == 'b' && input.unsafe_get(2) == 'x'
+  _ => false
+}
+```
+
+A `$` pattern compares from the end, `input.unsafe_get(input.length() - 1)`
+first. A character outside the Basic Multilingual Plane is two code units; its
+halves are compared as integers, such as `0xD83D`.
+
+### 2.3 `before` and `after`
+
+When `before` or `after` is bound and the literals differ in length, the code
+computes the length of the match, or -1 for no match, and the case body appears
+once. Which literal is the match follows the matching model:
+
+- A prefix test under first-match takes the earliest alternative that matches,
+  in source order.
+- A prefix test under `with longest` takes the longest one.
+- A suffix test takes the longest one, under either strategy: every match ends
+  at the end of the input, so the leftmost match is the longest.
+
+`(re"^(abc|a)", after=rest)`, where `abc` is tried first:
+
+```moonbit
+let length = if input.length() >= 1 && input.unsafe_get(0) == 'a' {
+  if input.length() >= 3 && input.unsafe_get(1) == 'b' && input.unsafe_get(2) == 'c' { 3 } else { 1 }
+} else {
+  -1
+}
+if length >= 0 {
+  let rest = input.view(start_offset=length)
+  ...
+}
+```
+
+A literal that can never be the match is dropped first. With
+`(re"^(a|abc)", after=rest)` under first-match, `a` is tried first and matches
+whenever `abc` does, so the match is `input.has_prefix("a")`, as for a single
+literal. When only whether a literal matches is observed, a literal that extends
+another one is dropped in the same way.
+
+### 2.4 Measured effect
+
+The following was measured on an Apple M2 Ultra running macOS 26.4, with Node
+v25.8.2 for js and wasm-gc and clang 22 at `-O3` for native. The baseline is
+the same match compiled with the table automaton. Inputs were built at run
+time, half of them matching; each figure is the median of five samples of at
+least 35 ms each. The sets were the first 1 to 8 of the keywords `return`,
+`break`, `continue`, `else`, `while`, `match`, `struct` and `trait` as prefix,
+exact and suffix tests; 2 to 8 literals of 8 code units sharing up to 7
+leading units; and four literals of 4 to 32 code units.
+
+For every one of the 153 sets that is lowered, the trie was faster than the
+automaton on every target:
+
+| Target | Median time, relative to the automaton | Slowest set |
+| --- | ---: | ---: |
+| js | 0.58 | 0.99 |
+| wasm-gc | 0.35 | 0.71 |
+| native | 0.12 | 0.31 |
+
+The code is also smaller. The compiled output of a program whose only function
+matches `^(return|break|continue)`:
+
+| Target | Automaton | Trie |
+| --- | ---: | ---: |
+| js | 2,455 bytes | 1,075 bytes |
+| wasm-gc | 1,398 bytes | 484 bytes |
+| native | 1,240 bytes | 372 bytes |
+
+Native sizes count object code and constants, not the linked runtime.
 
 ## 3. Choosing a form
 
