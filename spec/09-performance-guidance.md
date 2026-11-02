@@ -1,8 +1,9 @@
 # Performance Guidance
 
-This chapter is informative. It records how `moonc v0.10.19` compiles regex
-match expressions and `lexmatch`, so that programs, and the tools and agents
-that write them, can choose the form that runs fastest. It does not constrain
+This chapter is informative. It records how `moonc v0.10.19+bee578715`, the
+pre-release toolchain of 2026-11-02, compiles regex match expressions and
+`lexmatch`, so that programs, and the tools and agents that write them, can
+choose the form that runs fastest. It does not constrain
 conforming implementations: every form below has the result specified in the
 other chapters, however it is compiled.
 
@@ -299,7 +300,7 @@ When the input is bytes, match it with `reb"..."` rather than decoding it to a
 
 ## 6. What uses an automaton
 
-In `moonc v0.10.19`, a match uses an automaton when any of these holds:
+In this toolchain, a match uses an automaton when any of these holds:
 
 - it is a `lexscan`;
 - a case has a pattern-level `as` binding, even when the bound text is a
