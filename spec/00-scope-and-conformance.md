@@ -11,6 +11,10 @@ baseline:
 | `moon` | `0.1.20261102` |
 | `moonc` | `v0.10.19+bee578715` |
 
+Both are the MoonBit pre-release toolchain of 2026-11-02. The stable build of
+`v0.10.19` (`moonc v0.10.19+97801ee1b`) predates bytes regexes, case-insensitive
+literal tries, and the several-case literal lowering.
+
 It does not claim to describe later MoonBit releases unless they preserve the
 same behavior. Confirmed divergences in the baseline implementation are kept in
 [Known Implementation Issues and Limitations](08-known-implementation-issues.md)
