@@ -9,7 +9,9 @@ This repository specifies the MoonBit language behavior of:
   `@lexbuf.StringScanner`.
 
 The specification targets `moon 0.1.20261102` and `moonc
-v0.10.19+bee578715`.
+v0.10.19+bee578715`, the MoonBit pre-release toolchain of 2026-11-02, which CI
+installs with `install/unix.sh pre-release`. The stable `latest` build of
+`v0.10.19` (`+97801ee1b`) predates bytes regexes.
 
 The [published MoonBit v0.10.7 documentation](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan)
 is linked for comparison. Version differences and publicly reproducible
@@ -75,7 +77,7 @@ The full command performs:
 - a canonical formatter fixture; and
 - a coverage-ID audit that fails if any matrix row lacks a test.
 
-With the baseline stable toolchain, `--target all` runs `wasm`, `wasm-gc`,
+With the baseline toolchain, `--target all` runs `wasm`, `wasm-gc`,
 `js`, and `native`. The separately listed `llvm` target is experimental and is
 not runnable unless the toolchain installation includes its LLVM core bundle.
 

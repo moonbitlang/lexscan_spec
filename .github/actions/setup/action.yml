@@ -1,5 +1,5 @@
 name: Setup MoonBit
-description: Install the stable MoonBit toolchain and Node.js
+description: Install the pre-release MoonBit toolchain and Node.js
 runs:
   using: composite
   steps:
@@ -12,7 +12,7 @@ runs:
         curl --fail --silent --show-error --location --retry 3 \
           https://cli.moonbitlang.com/install/unix.sh \
           --output "$RUNNER_TEMP/install-moonbit.sh"
-        bash "$RUNNER_TEMP/install-moonbit.sh" latest
+        bash "$RUNNER_TEMP/install-moonbit.sh" pre-release
         echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
     - name: Record toolchain versions
       shell: bash
