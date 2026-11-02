@@ -1,0 +1,7 @@
+// BX-017
+fn unanchored(input : Bytes) -> Int {
+  lexmatch input {
+    reb"a" => 1
+    _ => 0
+  }
+}

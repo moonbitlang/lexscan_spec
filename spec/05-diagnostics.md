@@ -140,24 +140,34 @@ An ordinary `^` at the beginning of every alternative is the usual fix.
 
 ### E4014 — target type mismatch for `=~`
 
-The left operand of `=~` MUST be `String` or `StringView`. Other types emit the
-ordinary type-mismatch diagnostic E4014.
+The left operand of `=~` MUST be `String`, `StringView`, `Bytes`, or
+`BytesView`. Other types emit the ordinary type-mismatch diagnostic E4014.
 
 ### E4222 — Invalid lexical target
 
 E4222 is shared by the two lexical expressions:
 
-- `lexmatch` expects `String` or `StringView`;
+- `lexmatch` expects `String`, `StringView`, `Bytes`, or `BytesView`;
 - `lexscan` expects `@lexbuf.Lexbuf`, `@lexbuf.AsyncLexbuf`, or
   `@lexbuf.StringScanner`.
 
 The types are nominal. Duck-typed scanner substitutes are invalid.
 
+### E4234 — Regex kind does not match the target
+
+A text regex atom (`re"..."` or a `Regex` constant) used on a `Bytes` or
+`BytesView` target, or a bytes regex atom (`reb"..."` or a `BytesRegex`
+constant) used on a `String`, `StringView`, or `lexscan` target, emits E4234.
+It is reported once per disagreeing atom, in `=~` and in every `lexmatch` or
+`lexscan` case. See [Bytes Regex Patterns](10-bytes-regex.md#4-regex-kinds).
+
 ### E4037 — Required core package not imported
 
-The `Regex` type is re-exported by the prelude. Regex literals and `=~` do not
-require a direct `moonbitlang/core/string` import and MUST NOT produce E4037
-merely because that package was not imported by the user package.
+The `Regex` and `BytesRegex` types are re-exported by the prelude. Regex
+literals, bytes regex literals, `=~`, and `lexmatch` do not require a direct
+`moonbitlang/core/string` or `moonbitlang/core/bytes` import and MUST NOT
+produce E4037 merely because that package was not imported by the user
+package.
 
 `lexscan` requires a direct `moonbitlang/core/lexbuf` import in the package
 containing the expression.
@@ -181,7 +191,7 @@ wildcard spellings have the same ordering rule.
 A `lexscan` catch-all MUST be `_`. A binder such as `rest => ...` emits E4216.
 
 `lexmatch` permits a binder catch-all and gives it the entire input as a
-`StringView` when it is final.
+`StringView`, or a `BytesView` for a bytes target, when it is final.
 
 ### E4224 — Reachable implicit catch-all has no body
 
@@ -189,7 +199,8 @@ E4224 applies to both `lexmatch` and `lexscan`.
 
 It is emitted when exhaustiveness analysis finds an input that reaches the implicit
 catch-all and no catch-all body is present. The message contains a shortest
-counterexample expressed as UTF-16 code units.
+counterexample, expressed as UTF-16 code units for a text target and as bytes
+for a bytes target.
 
 A case list proven exhaustive may omit the catch-all.
 

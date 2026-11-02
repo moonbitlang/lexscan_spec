@@ -1,11 +1,11 @@
 // LM-002A
 struct UserTarget {}
 
-fn bytes_target(input : Bytes) -> Int {
+fn integer_target(input : Int) -> Int {
   lexmatch input { _ => 0 }
 }
 
-fn bytes_view_target(input : BytesView) -> Int {
+fn byte_array_target(input : Array[Byte]) -> Int {
   lexmatch input { _ => 0 }
 }
 

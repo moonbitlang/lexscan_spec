@@ -47,7 +47,9 @@ subject to ordinary catch-all ordering and TODO-hole typing rules.
 
 ## 3. Target typing
 
-The target MUST have type `String` or `StringView`.
+The target MUST have type `String`, `StringView`, `Bytes`, or `BytesView`.
+This chapter describes text targets; a `Bytes` or `BytesView` target takes
+bytes patterns, as specified in [Bytes Regex Patterns](10-bytes-regex.md).
 
 A `String` target is implicitly converted to a `StringView`. All captures and
 unmatched pieces of type `StringView` denote the corresponding target ranges;
@@ -58,8 +60,9 @@ For a sliced `StringView`, all ranges remain bounded by the slice. For a
 temporary `String` target, returned captures, `before`, `after`, and a binder
 catch-all remain valid views for as long as those views are reachable.
 
-`Bytes`, `BytesView`, lexbuf types, `StringScanner`, and arbitrary user-defined
-types are invalid `lexmatch` targets.
+Numeric types, lexbuf types, `StringScanner`, and arbitrary user-defined types
+are invalid `lexmatch` targets (E4222). Each regex case whose kind disagrees
+with the target is rejected with E4234.
 
 ## 4. Regex cases
 

@@ -6,11 +6,12 @@ matrix=$(mktemp "${TMPDIR:-/tmp}/moonbit-regex-matrix.XXXXXX")
 implemented=$(mktemp "${TMPDIR:-/tmp}/moonbit-regex-implemented.XXXXXX")
 trap 'rm -f "$matrix" "$implemented"' EXIT
 
-rg -o '^\| (RX|RM|LM|LS)-[0-9]+[A-Z]? ' "$ROOT/spec/06-conformance-matrix.md" |
+rg -o '^\| (RX|RM|LM|LS|BX)-[0-9]+[A-Z]? ' "$ROOT/spec/06-conformance-matrix.md" |
   sed -E 's/^\| ([A-Z]+-[0-9]+[A-Z]?) /\1/' |
   sort -u > "$matrix"
 
-rg -o '(RX|RM|LM|LS)-[0-9]+[A-Z]?' \
+rg -o '(RX|RM|LM|LS|BX)-[0-9]+[A-Z]?' \
+  "$ROOT/bytes_match" \
   "$ROOT/regex_syntax" \
   "$ROOT/regex_match" \
   "$ROOT/lexmatch" \

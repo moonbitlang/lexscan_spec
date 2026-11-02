@@ -39,3 +39,9 @@ pub const QUALIFIED_PAIR : Regex = QUALIFIED_A + QUALIFIED_B
 
 ///|
 pub const QUALIFIED_EITHER : Regex = QUALIFIED_A | QUALIFIED_B
+
+///|
+pub const QUALIFIED_HIGH_BYTE = reb"[\x80-\xff]"
+
+///|
+pub const QUALIFIED_BYTES_VERB : BytesRegex = reb"GET" | reb"POST"

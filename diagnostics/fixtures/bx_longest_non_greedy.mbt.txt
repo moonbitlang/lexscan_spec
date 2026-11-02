@@ -1,0 +1,7 @@
+// BX-015
+fn non_greedy(input : Bytes) -> Int {
+  lexmatch input with longest {
+    (reb"^a+?", after=_) => 1
+    _ => 0
+  }
+}

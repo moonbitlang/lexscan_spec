@@ -1,0 +1,12 @@
+// BX-014
+fn exhaustive(input : Bytes) -> Int {
+  lexmatch input {
+    reb"^.*$" => 1
+  }
+}
+
+fn exhaustive_range(input : BytesView) -> Int {
+  lexmatch input {
+    reb"^[\x00-\xff]*$" => 1
+  }
+}

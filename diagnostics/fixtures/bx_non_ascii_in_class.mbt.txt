@@ -1,0 +1,4 @@
+// BX-012
+fn non_ascii_in_class(input : Bytes) -> Bool {
+  input =~ reb"[é]"
+}

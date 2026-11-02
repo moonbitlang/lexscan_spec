@@ -1,0 +1,4 @@
+// BX-012
+fn fixed_unicode_escape(input : Bytes) -> Bool {
+  input =~ reb"\u0041"
+}

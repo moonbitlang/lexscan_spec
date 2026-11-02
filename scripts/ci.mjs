@@ -32,7 +32,7 @@ export function classify(entry, success, status, output) {
 
 function inventory() {
   const tests = new Map();
-  for (const dir of ['lexmatch', 'lexscan', 'regex_match', 'regex_syntax']) {
+  for (const dir of ['bytes_match', 'lexmatch', 'lexscan', 'regex_match', 'regex_syntax']) {
     for (const file of readdirSync(join(root, dir)).filter(f => f.endsWith('.mbt'))) {
       const path = `${dir}/${file}`;
       const source = readFileSync(join(root, path), 'utf8');
