@@ -3,11 +3,7 @@ fn integer_target() -> Bool {
   1 =~ re"a"
 }
 
-fn bytes_target(input : Bytes) -> Bool {
-  input =~ re"a"
-}
-
-fn bytes_view_target(input : BytesView) -> Bool {
+fn byte_array_target(input : Array[Byte]) -> Bool {
   input =~ re"a"
 }
 

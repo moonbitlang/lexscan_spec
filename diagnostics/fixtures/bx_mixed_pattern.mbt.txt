@@ -1,0 +1,10 @@
+// BX-010
+const TEXT = re"b"
+
+fn mixed_literals(input : Bytes) -> Bool {
+  input =~ (reb"a" + re"b")
+}
+
+fn mixed_constant(input : Bytes) -> Bool {
+  input =~ (reb"a" | TEXT)
+}

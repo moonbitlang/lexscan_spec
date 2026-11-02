@@ -15,11 +15,16 @@ regex-pattern     ::= regex-alternation
 regex-alternation ::= regex-sequence ("|" regex-sequence)*
 regex-sequence    ::= regex-atom ("+" regex-atom)*
 regex-atom        ::= REGEX_LITERAL
+                    | BYTES_REGEX_LITERAL
                     | qualified-constant-name
                     | "(" regex-pattern ")"
 ```
 
-In source code, `REGEX_LITERAL` is written `re"..."`.
+In source code, `REGEX_LITERAL` is written `re"..."` and
+`BYTES_REGEX_LITERAL` is written `reb"..."`. This chapter specifies text
+regexes, which match `String` and `StringView`. Bytes regexes, which match
+`Bytes` and `BytesView`, and the rule that all atoms of a pattern have one
+kind are specified in [Bytes Regex Patterns](10-bytes-regex.md).
 
 At pattern level, `+` binds more tightly than `|`. The `as` form is more
 restricted than an ordinary infix or postfix operator: it may follow only one

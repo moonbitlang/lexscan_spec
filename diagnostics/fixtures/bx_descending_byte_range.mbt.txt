@@ -1,0 +1,4 @@
+// BX-013
+fn descending_byte_range(input : Bytes) -> Bool {
+  input =~ reb"[\x80-\x7f]"
+}

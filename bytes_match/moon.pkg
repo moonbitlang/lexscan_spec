@@ -1,0 +1,3 @@
+import {
+  "moonbitlang/regex-lexical-spec/patterns",
+} for "test"

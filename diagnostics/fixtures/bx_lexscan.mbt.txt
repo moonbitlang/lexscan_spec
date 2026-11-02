@@ -1,0 +1,7 @@
+// BX-011
+fn scan(input : @lexbuf.StringScanner) -> Int {
+  lexscan input {
+    reb"^a" => 1
+    _ => 0
+  }
+}

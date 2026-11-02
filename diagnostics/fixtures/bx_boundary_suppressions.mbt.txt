@@ -1,0 +1,8 @@
+// BX-017
+fn suppressed(input : Bytes) -> Int {
+  lexmatch input {
+    (reb"a", before=_, after=_) => 1
+    reb"^b$" => 2
+    _ => 0
+  }
+}

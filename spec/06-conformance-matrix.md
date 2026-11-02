@@ -114,8 +114,8 @@ Priority labels:
 | --- | --- | --- | --- |
 | RM-001 | P0 | `String` target accepted and implicitly viewed | typing + runtime |
 | RM-002 | P0 | `StringView` target accepted, including a slice | runtime |
-| RM-003 | P0 | non-text target rejected | E4014 |
-| RM-003A | P1 | numeric, `Bytes`, `BytesView`, and scanner targets are all rejected | E4014 |
+| RM-003 | P0 | a target that is neither text nor bytes is rejected | E4014 |
+| RM-003A | P1 | numeric, `Array[Byte]`, lexbuf, and scanner targets are all rejected | E4014 |
 | RM-004 | P0 | expression result type is `Bool` | typing |
 | RM-005 | P0 | unanchored pattern searches and chooses earliest start | runtime |
 | RM-006 | P0 | alternative order chooses match at same start | runtime |
@@ -150,7 +150,7 @@ Priority labels:
 | --- | --- | --- | --- |
 | LM-001 | P0 | `String` and `StringView` targets accepted | typing + runtime |
 | LM-002 | P0 | other targets rejected | E4222 |
-| LM-002A | P1 | numeric, `Bytes`, `BytesView`, `Lexbuf`, `AsyncLexbuf`, `StringScanner`, and user-defined targets are rejected | E4222 |
+| LM-002A | P1 | numeric, `Array[Byte]`, `Lexbuf`, `AsyncLexbuf`, `StringScanner`, and user-defined targets are rejected | E4222 |
 | LM-003 | P0 | omitted strategy equals `first` | runtime |
 | LM-004 | P0 | explicit `with first` accepted | parse + runtime |
 | LM-005 | P0 | unsupported strategy rejected | E4180 |
@@ -287,11 +287,35 @@ Priority labels:
 | LS-042 | P2 | formatter canonicalizes strategies, regex cases, binding tuples, catch-alls, and placeholder cases | format |
 | LS-043 | P1 | a `lexscan` arm whose pattern has an error reports no E4218 or E4224 derived from it | E4172 + absent codes |
 
-## 6. Cross-cutting test dimensions
+## 6. Bytes regex (`reb"..."`)
+
+| ID | Priority | Requirement | Expected test kind |
+| --- | --- | --- | --- |
+| BX-001 | P0 | a `reb"..."` literal has type `BytesRegex`, available through the prelude without a direct `moonbitlang/core/bytes` import | typing |
+| BX-002 | P0 | `=~` accepts `Bytes` and sliced `BytesView` targets with bytes patterns; `before` and `after` are `BytesView` views bounded by the slice | typing + runtime |
+| BX-003 | P0 | a first-strategy `lexmatch` over bytes keeps source case priority and leftmost search | runtime |
+| BX-004 | P0 | a longest-strategy `lexmatch` over bytes selects the case consuming the most bytes | runtime |
+| BX-005 | P0 | `.`, a negated class, and `[^]` match any one byte, including newline and bytes above `0x7F`; `[]` matches none | runtime |
+| BX-006 | P0 | `\xHH`, in either case, denotes one byte, also in a class and as a range endpoint | runtime |
+| BX-007 | P1 | `(?i:...)` folds only ASCII letters; `\b`, `[[:word:]]`, and `[[:ascii:]]` are ASCII, and bytes above `0x7F` are non-word bytes | runtime |
+| BX-008 | P0 | an `as` binder is `Byte` when its regex matches exactly one byte and `BytesView` otherwise; a binder catch-all receives the target as a `BytesView` | typing + runtime |
+| BX-009 | P1 | unqualified, qualified, and `+`/`\|`-composed `BytesRegex` constants are pattern atoms | typing + runtime |
+| BX-010 | P0 | a text atom on a bytes target, a bytes atom on a text target, and a pattern or case list mixing both kinds are rejected | E4234 |
+| BX-011 | P0 | a bytes regex in a `lexscan` case is rejected | E4234 |
+| BX-012 | P0 | a non-ASCII character or a Unicode escape in a bytes regex is rejected | E4172 |
+| BX-013 | P1 | a malformed `\x` escape, `\cX`, `\0`, a shorthand class escape, and a descending byte range are rejected in a bytes regex | E4172 |
+| BX-014 | P1 | exhaustiveness and reachability are analyzed over bytes: a missing catch-all is reported, an exhaustive bytes case list needs none, and unreachable cases warn | E4224 + E0090 |
+| BX-015 | P1 | longest-strategy bytes cases require start anchoring and reject non-greedy quantifiers | E4218 + E4172 |
+| BX-016 | P1 | `Array[Byte]` and `FixedArray[Byte]` are not bytes targets | E4014 + E4222 |
+| BX-017 | P1 | E0080 and E0081 apply to bytes `lexmatch` cases and are suppressed in the same ways | warning |
+| BX-018 | P1 | single literals, literal sets, case-insensitive literals, and several literal cases over bytes keep first-match, longest-match, and slice semantics, and evaluate the target once | runtime |
+
+## 7. Cross-cutting test dimensions
 
 The suite SHOULD combine the rows above with these dimensions where relevant:
 
-- target is `String` versus a sliced `StringView`;
+- target is `String` versus a sliced `StringView`, and `Bytes` versus a sliced
+  `BytesView`;
 - ASCII, BMP non-ASCII, and non-BMP scalar values;
 - empty input, one-scalar input, and long input;
 - empty, single-scalar, fixed-length multi-scalar, and variable-length captures;
@@ -302,11 +326,13 @@ The suite SHOULD combine the rows above with these dimensions where relevant:
 - all supported compilation targets used by the repository; and
 - debug versus release where generated scanner structure may differ.
 
-## 7. Suite layout
+## 8. Suite layout
 
 The executable repository uses this layout:
 
 ```text
+bytes_match/
+  bytes_test.mbt
 regex_match/
   basic_test.mbt
 lexmatch/

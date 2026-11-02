@@ -8,8 +8,8 @@ baseline:
 
 | Item | Baseline |
 | --- | --- |
-| `moon` | `0.1.20261023` |
-| `moonc` | `v0.10.17+d971670cd` |
+| `moon` | `0.1.20261102` |
+| `moonc` | `v0.10.19+bee578715` |
 
 It does not claim to describe later MoonBit releases unless they preserve the
 same behavior. Confirmed divergences in the baseline implementation are kept in
@@ -38,6 +38,8 @@ This specification covers:
 
 - the regex pattern syntax shared by `=~`, `lexmatch`, and `lexscan`;
 - regex literal and regex constant references in pattern position;
+- bytes regex literals `reb"..."` and their use with `=~` and `lexmatch` on
+  `Bytes` and `BytesView` ([Bytes Regex Patterns](10-bytes-regex.md));
 - matching strategies and branch priority;
 - anchoring and unmatched-prefix/suffix bindings;
 - substring capture and capture types;
@@ -47,9 +49,9 @@ This specification covers:
 - compile-time restrictions, errors, and warnings; and
 - Unicode and UTF-16 behavior visible to MoonBit programs.
 
-First-class `Regex` values and runtime methods such as `Regex::execute` are in
-scope only where their construction or capture metadata affects a regex pattern
-used by one of the three expressions.
+First-class `Regex` and `BytesRegex` values and runtime methods such as
+`Regex::execute` are in scope only where their construction or capture metadata
+affects a regex pattern used by one of the three expressions.
 
 ## 4. Features out of scope
 
@@ -57,7 +59,7 @@ The following are not specified here:
 
 - non-public compiler internals;
 - performance, allocation count, and code-size guarantees;
-- runtime `Regex` APIs unrelated to pattern use;
+- runtime `Regex` and `BytesRegex` APIs unrelated to pattern use;
 - the removed string-piece lexical-pattern syntax; and
 - the removed `lexmatch?` boolean expression.
 
@@ -69,7 +71,7 @@ MUST NOT be treated as current syntax.
 
 ### 5.1 Text domain
 
-The target input domain of this specification is well-formed UTF-16. For
+The target input domain of a text regex (`re"..."`) is well-formed UTF-16. For
 well-formed UTF-16 input, the surface regex language denotes sequences of
 Unicode scalar values. Literal characters, `.`, character classes, repetition,
 alternation, and captures are defined at that level.
@@ -102,11 +104,16 @@ them, and conformance tests MUST NOT depend on such behavior. This does not
 change the separate rule that a regex itself cannot express an isolated
 surrogate.
 
+A bytes regex (`reb"..."`) matches `Bytes` and `BytesView`. Its domain is
+every sequence of bytes, with no encoding and no well-formedness condition;
+[Bytes Regex Patterns](10-bytes-regex.md) defines it.
+
 ### 5.2 Input boundaries
 
 `^` denotes the beginning of the logical input presented to the expression:
 
-- offset zero of the `String` or `StringView` for `=~` and `lexmatch`;
+- offset zero of the `String`, `StringView`, `Bytes`, or `BytesView` for `=~`
+  and `lexmatch`;
 - the cursor position at which a `lexscan` expression starts; or
 - the current `StringScanner.cursor` position within its `data` view.
 

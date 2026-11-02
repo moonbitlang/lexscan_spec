@@ -52,7 +52,10 @@ Parentheses used only for grouping may be nested inside that outer pair.
 
 ## 3. Target typing
 
-The left operand MUST have type `String` or `StringView`.
+The left operand MUST have type `String`, `StringView`, `Bytes`, or
+`BytesView`. This chapter describes text targets; a `Bytes` or `BytesView`
+target takes a bytes pattern, as specified in
+[Bytes Regex Patterns](10-bytes-regex.md).
 
 A `String` is implicitly viewed as a `StringView`. Captures and unmatched
 pieces have type `StringView` over the corresponding target ranges. This
@@ -62,7 +65,9 @@ backing-storage identity.
 For a sliced `StringView`, `before`, captures, and `after` are all bounded by
 the slice. They do not include text from the backing string outside the view.
 
-Other types, including `Bytes`, `BytesView`, and numeric types, are invalid.
+Other types, including numeric types, `Array[Byte]`, and scanners, are
+invalid (E4014). A text pattern on a `Bytes` or `BytesView` target is rejected
+with E4234.
 
 The regex pattern is compiled from literals and constants. The `Regex` type is
 re-exported by the prelude, so neither a regex literal nor `=~` requires the

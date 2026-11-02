@@ -1,0 +1,15 @@
+// BX-014
+fn shadowed(input : Bytes) -> Int {
+  lexmatch input {
+    (reb"^a", after=_) => 1
+    (reb"^ab", after=_) => 2
+    _ => 0
+  }
+}
+
+fn unreachable_catchall(input : Bytes) -> Int {
+  lexmatch input {
+    reb"^.*$" => 1
+    _ => 0
+  }
+}

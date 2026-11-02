@@ -1,0 +1,8 @@
+// BX-010
+fn mixed_cases(input : Bytes) -> Int {
+  lexmatch input {
+    (reb"^a", after=_) => 1
+    (re"^b", after=_) => 2
+    _ => 0
+  }
+}

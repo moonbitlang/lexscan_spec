@@ -50,7 +50,9 @@ The target MUST have exactly one of these concrete types:
 | `@lexbuf.StringScanner` | non-streaming scanner | no | yes |
 
 `String`, `StringView`, `Bytes`, `BytesView`, numeric types, and user-defined
-lexbuf-shaped types are invalid.
+lexbuf-shaped types are invalid. Every target is text, so a bytes regex
+(`reb"..."` or a `BytesRegex` constant) in a `lexscan` case is rejected with
+E4234; see [Bytes Regex Patterns](10-bytes-regex.md#52-lexscan).
 
 Direct scanning of `String` and `StringView` has migrated to `lexmatch`.
 `StringScanner` is the in-memory `lexscan` target for clients that require a

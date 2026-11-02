@@ -1,0 +1,8 @@
+// BX-010
+fn string_target(input : String) -> Bool {
+  input =~ reb"a"
+}
+
+fn string_view_target(input : StringView) -> Bool {
+  input =~ reb"a"
+}

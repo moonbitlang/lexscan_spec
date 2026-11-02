@@ -1,0 +1,4 @@
+// BX-013
+fn shorthand_escape(input : Bytes) -> Bool {
+  input =~ reb"\d"
+}

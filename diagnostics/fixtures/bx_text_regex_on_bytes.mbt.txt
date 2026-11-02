@@ -1,0 +1,8 @@
+// BX-010
+fn bytes_target(input : Bytes) -> Bool {
+  input =~ re"a"
+}
+
+fn bytes_view_target(input : BytesView) -> Bool {
+  input =~ re"a"
+}

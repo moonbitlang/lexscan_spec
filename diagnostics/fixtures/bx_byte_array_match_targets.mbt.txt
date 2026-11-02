@@ -1,0 +1,8 @@
+// BX-016
+fn array_target(input : Array[Byte]) -> Bool {
+  input =~ reb"a"
+}
+
+fn fixed_array_target(input : FixedArray[Byte]) -> Bool {
+  input =~ reb"a"
+}

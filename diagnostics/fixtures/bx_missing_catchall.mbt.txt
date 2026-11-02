@@ -1,0 +1,7 @@
+// BX-014
+fn missing_catchall(input : Bytes) -> Int {
+  lexmatch input {
+    (reb"^[\x00-\xfe]", after=_) => 1
+    reb"^$" => 2
+  }
+}

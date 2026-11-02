@@ -3,12 +3,13 @@
 This repository specifies the MoonBit language behavior of:
 
 - regex match expressions using `=~`;
-- `lexmatch` expressions over `String` and `StringView`; and
+- `lexmatch` expressions over `String` and `StringView`, and, with bytes
+  regexes `reb"..."`, over `Bytes` and `BytesView`; and
 - `lexscan` expressions over `@lexbuf.Lexbuf`, `@lexbuf.AsyncLexbuf`, and
   `@lexbuf.StringScanner`.
 
-The specification targets `moon 0.1.20261023` and `moonc
-v0.10.17+d971670cd`.
+The specification targets `moon 0.1.20261102` and `moonc
+v0.10.19+bee578715`.
 
 The [published MoonBit v0.10.7 documentation](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan)
 is linked for comparison. Version differences and publicly reproducible
@@ -27,6 +28,7 @@ compiler materials.
 - [Review questions](spec/07-review-questions.md)
 - [Known implementation issues and limitations](spec/08-known-implementation-issues.md)
 - [Performance guidance](spec/09-performance-guidance.md) (informative)
+- [Bytes regex patterns (`reb"..."`)](spec/10-bytes-regex.md)
 
 ## Writing fast matches
 
@@ -34,16 +36,20 @@ For code generators and agents, in short (details in
 [Performance guidance](spec/09-performance-guidance.md)):
 
 - Test for a fixed string with `=~` and an anchored literal: `s =~ re"^#"`,
-  `s =~ (re"\.mbt$", before=stem)`. It compiles to one `==`, `has_prefix`,
-  `has_suffix` or `find` call, with no automaton.
+  `s =~ (re"\.mbt$", before=stem)`. It compiles to one `==`, prefix, suffix
+  or `find` test, with no automaton.
+- Small anchored sets of literals, such as `s =~ re"^(if|else|while)$"`, and
+  anchored literals ignoring ASCII case, such as `re"^(?i:host):"`, are
+  compared as a trie, with no automaton.
+- A `lexmatch` whose cases are all such literals anchored with `^` only, with
+  a catch-all and no `as` binding, compares all cases in one trie. A single
+  regex case followed by a catch-all compiles like `=~`.
 - Anchor with `^` and `$` when a prefix, suffix or whole input is meant; an
   unanchored pattern is a search.
 - Use `before` and `after` instead of an `as` binding when they give what is
   needed: any `as` binding makes the match use an automaton.
-- A `lexmatch` with several regex cases always uses an automaton. A single
-  regex case followed by a catch-all compiles like `=~`.
-- From the release after `v0.10.17`, small anchored sets of literals, such as
-  `s =~ re"^(if|else|while)$"`, are also compared without an automaton.
+- Match `Bytes` and `BytesView` with `reb"..."` instead of decoding them; the
+  same rules apply.
 
 ## Project status
 
@@ -51,8 +57,8 @@ The specification and executable conformance suite are both present. Runtime,
 typing, diagnostic, warning, formatting, multi-backend, Unicode, streaming, and
 coverage-audit tests correspond directly to the IDs in the conformance matrix.
 
-The current matrix contains 251 independently testable requirements. The
-ordinary runtime/type layer contains 136 tests; diagnostic fixtures and format
+The current matrix contains 269 independently testable requirements. The
+ordinary runtime/type layer contains 146 tests; diagnostic fixtures and format
 fixtures cover the remaining compile-time requirements and interactions.
 
 Run the complete suite with:
