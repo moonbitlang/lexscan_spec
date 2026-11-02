@@ -15,4 +15,4 @@ moon test --target all
 moon test --target all --release
 bash scripts/check_format_fixture.sh
 bash scripts/check_coverage_ids.sh
-"${MOONC_OVERRIDE_ARGS[@]}" bash diagnostics/run.sh
+${MOONC_OVERRIDE_ARGS[@]+"${MOONC_OVERRIDE_ARGS[@]}"} bash diagnostics/run.sh
