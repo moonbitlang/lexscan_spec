@@ -37,9 +37,11 @@ bytes-regex-literal ::= 'reb"' regex-body '"'
 ordinary identifier, so `re b"x"`, with a space, is the identifier `re`
 followed by the bytes literal `b"x"`.
 
-The body is read as the body of `re"..."` is: it is raw, it ends at the first
-`"` not preceded by `\`, it cannot contain a line break, and no escape is
-processed before the regex parser reads it. Interpolation is not accepted:
+The body is read as the body of `re"..."` is: it is raw, a backslash and the
+character after it are kept together, so the body ends at the first `"` that
+does not follow an unpaired backslash (`reb"\\"` is the one escaped
+backslash), it cannot contain a line break, and no escape is processed before
+the regex parser reads it. Interpolation is not accepted:
 `\{` is rejected as it is in `re"..."`. Write a literal left brace as `[{]`.
 
 In an ordinary expression, `reb"..."` has type `BytesRegex`. `BytesRegex` is

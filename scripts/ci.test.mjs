@@ -49,7 +49,7 @@ import { spawnSync } from 'node:child_process';
 test('CI executes isolated FIXMEs and fails on XPASS, unlisted failures, or stale names', () => {
   const root = mkdtempSync(join(tmpdir(), 'lexscan-ci-test-'));
   try {
-    for (const dir of ['scripts', 'diagnostics', 'lexmatch', 'lexscan', 'regex_match', 'regex_syntax', 'bin']) {
+    for (const dir of ['scripts', 'diagnostics', 'bytes_match', 'lexmatch', 'lexscan', 'regex_match', 'regex_syntax', 'bin']) {
       mkdirSync(join(root, dir));
     }
     cpSync(new URL('./ci.mjs', import.meta.url), join(root, 'scripts/ci.mjs'));

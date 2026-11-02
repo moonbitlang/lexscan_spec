@@ -171,3 +171,4 @@ bx_byte_array_match_targets	error	E4014	E4234	-
 bx_byte_array_lexmatch_targets	error	E4222	-	-
 bx_boundary_warnings	warning	E0080,E0081	-	-
 bx_boundary_suppressions	warning	-	E0080,E0081	-
+bx_fixed_array_lexmatch_target	error	E4222	-	-
