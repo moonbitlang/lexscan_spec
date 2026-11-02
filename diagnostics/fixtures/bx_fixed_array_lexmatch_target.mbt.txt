@@ -1,0 +1,7 @@
+// BX-016
+fn fixed_array_target(input : FixedArray[Byte]) -> Int {
+  lexmatch input {
+    (reb"^a", after=_) => 1
+    _ => 0
+  }
+}

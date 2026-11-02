@@ -57,16 +57,16 @@ test "BX-003 first-strategy lexmatch over bytes" {
   assert_eq(first(b"ab"), 1)
   assert_eq(first(b"b"), 2)
   assert_eq(first(b"c"), 0)
-  let search = fn(input : Bytes) -> String {
+  let search = fn(input : Bytes) -> (String, BytesView, BytesView) {
     lexmatch input {
-      (reb"a", before=_, after=_) => "a-case"
-      (reb"b", before=_, after=_) => "b-case"
-      _ => "none"
+      (reb"a", before~, after~) => ("a-case", before, after)
+      (reb"b", before~, after~) => ("b-case", before, after)
+      whole => ("none", whole, whole)
     }
   }
-  assert_eq(search(b"ba"), "a-case")
-  assert_eq(search(b"zb"), "b-case")
-  assert_eq(search(b"z"), "none")
+  assert_eq(search(b"bab"), ("a-case", b"b", b"b"))
+  assert_eq(search(b"zbxb"), ("b-case", b"z", b"xb"))
+  assert_eq(search(b"z"), ("none", b"z", b"z"))
 }
 
 ///|
@@ -266,4 +266,35 @@ test "BX-018 literal forms keep the matching model" {
   }
   assert_eq(shadow(b"ab"), 1)
   assert_eq(shadow(b"b"), 2)
+  // Every lowering evaluates its target once, on success and on failure.
+  let once = fn(matched : Bool, expected : Bool) raise {
+    assert_eq(matched, expected)
+    assert_eq(evaluated.val, 1)
+    evaluated.val = 0
+  }
+  evaluated.val = 0
+  once(target(b"GETx") =~ reb"^GET", true)
+  once(target(b"xGET") =~ reb"^GET", false)
+  once(target(b"a.mbt") =~ reb"\.mbt$", true)
+  once(target(b"xxGETyy") =~ reb"GET", true)
+  once(target(b"xxGEyy") =~ reb"GET", false)
+  once(target(long) =~ reb"^0123456789012345678901234567890123456789$", true)
+  once(target(b"else") =~ reb"^(if|else|while)$", true)
+  once(target(b"elsex") =~ reb"^(if|else|while)$", false)
+  once(target(b"abc") =~ (reb"^(a|abc)", after=_), true)
+  once(target(b"x.mbti") =~ (reb"(i|\.mbti)$", before=_), true)
+  once(target(b"ACCEPT: x") =~ reb"^(?i:host|accept): ", true)
+  once(target(b"ACCEPT x") =~ reb"^(?i:host|accept): ", false)
+  let dispatched = lexmatch target(b"PUT /") {
+    (reb"^GET ", after=_) => 1
+    (reb"^(POST|PUT) ", after=_) => 2
+    _ => 0
+  }
+  once(dispatched == 2, true)
+  let missed = lexmatch target(b"PATCH /") {
+    (reb"^GET ", after=_) => 1
+    (reb"^(POST|PUT) ", after=_) => 2
+    _ => 0
+  }
+  once(missed == 0, true)
 }

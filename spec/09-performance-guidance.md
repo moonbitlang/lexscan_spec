@@ -52,10 +52,10 @@ A literal character is a character that stands for exactly one character: an
 ordinary or escaped character such as `\.`, a character class with one member
 such as `[.]`, or a character in a case-insensitive group that has no other
 case, such as the digit in `(?i:0)`. An ASCII letter in a case-insensitive
-group, or a class of the two cases of one letter such as `[Hh]`, is a folded
-letter (section 2.5).
+group, or a class of the two cases of one letter such as `[Hh]` or `(H|h)`, is
+a folded letter (section 2.5).
 
-An alternation of single characters is a character class, not a set of
+Any other alternation of single characters is a character class, not a set of
 literals: `(a|b)` is `[ab]`, so `^(a|b)$` and `^x(a|b)$` are not literal sets,
 while `^(ab|cd)$` is.
 
@@ -113,6 +113,7 @@ folded:
 | --- | --- | --- |
 | `^(?i:host):` | yes | the colon has no case |
 | `^(?i:get\|post) ` | yes | two folded literals |
+| `^[Hh][Oo][Ss][Tt]:`, `^(H\|h)(O\|o)(S\|s)(T\|t):` | yes | the same folded literal as `^(?i:host):` |
 | `^[Hh]ost` | no | `ost` is exact while `[Hh]` is folded |
 | `^(?i:if)x` | no | `x` is exact while `if` is folded |
 | `(?i:if)` | no | a search |
@@ -306,8 +307,8 @@ In this toolchain, a match uses an automaton when any of these holds:
 - a case has a pattern-level `as` binding, even when the bound text is a
   literal known in advance;
 - a pattern contains a character class with more than one member, such as
-  `[0-9]` or `(a|b)`, `.`, a repetition, or an assertion other than the outer
-  `^` and `$`, such as `\b`;
+  `[0-9]` or `(a|b)`, other than the two cases of one ASCII letter; `.`; a
+  repetition; or an assertion other than the outer `^` and `$`, such as `\b`;
 - a pattern searches for several literals, such as `(if|else)`, or searches
   ignoring case, such as `(?i:if)`;
 - a pattern mixes folded and exact letters, such as `^(?i:if)x`;
